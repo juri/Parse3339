@@ -375,7 +375,7 @@ public func parse(_ string: some StringProtocol) -> Parts? {
     parse(string.utf8)
 }
 
-public func parse<S>(_ seq: S) -> Parts? where S: Sequence, S.Element == UInt8 {
+public func parse(_ seq: some Sequence<UInt8>) -> Parts? {
     var state = State.year(year: State.Year(year: 0), count: 0)
 
     for element in seq {
@@ -544,20 +544,9 @@ public func parse<S>(_ seq: S) -> Parts? where S: Sequence, S.Element == UInt8 {
     return nil
 }
 
-private func parseDigit(_ source: some BinaryInteger) -> Int? {
-    switch source as? UInt8 {
-    case Component.n0.rawValue: return 0
-    case Component.n1.rawValue: return 1
-    case Component.n2.rawValue: return 2
-    case Component.n3.rawValue: return 3
-    case Component.n4.rawValue: return 4
-    case Component.n5.rawValue: return 5
-    case Component.n6.rawValue: return 6
-    case Component.n7.rawValue: return 7
-    case Component.n8.rawValue: return 8
-    case Component.n9.rawValue: return 9
-    default: return nil
-    }
+func parseDigit(_ source: UInt8) -> Int? {
+    let value = source &- Component.n0.rawValue
+    return value < 10 ? Int(value) : nil
 }
 
 private func checkYear(_ year: Int) -> Bool {
