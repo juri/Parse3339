@@ -370,6 +370,7 @@ enum Component: UInt8 {
     case zed = 0x5a
 }
 
+@inlinable
 public func parse(_ string: some StringProtocol) -> Parts? {
     parse(string.utf8)
 }
