@@ -22,6 +22,7 @@
 import Foundation
 
 private let calendar = Calendar(identifier: .gregorian)
+private let utc = TimeZone(secondsFromGMT: 0)
 
 public struct Parts {
     public let year: Int
@@ -50,7 +51,7 @@ public struct Parts {
     public var dateComponents: DateComponents {
         let d = DateComponents(
             calendar: calendar,
-            timeZone: TimeZone(secondsFromGMT: self.zoneSeconds),
+            timeZone: self.zoneSeconds == 0 ? utc : TimeZone(secondsFromGMT: self.zoneSeconds),
             year: self.year,
             month: self.month,
             day: self.day,
