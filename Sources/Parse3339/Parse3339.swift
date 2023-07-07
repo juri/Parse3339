@@ -121,15 +121,6 @@ private func addDigit(_ num: Int, to target: Int) -> Int {
 
 enum Component: UInt8 {
     case n0 = 0x30
-    case n1 = 0x31
-    case n2 = 0x32
-    case n3 = 0x33
-    case n4 = 0x34
-    case n5 = 0x35
-    case n6 = 0x36
-    case n7 = 0x37
-    case n8 = 0x38
-    case n9 = 0x39
     case colon = 0x3a
     case dash = 0x2d
     case tee = 0x54
