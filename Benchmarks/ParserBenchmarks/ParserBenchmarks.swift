@@ -5,11 +5,21 @@ import Parse3339
 let config = Benchmark.Configuration(maxDuration: .seconds(30), maxIterations: 100_000)
 
 let benchmarks = {
-    Benchmark("Parse with Parse3339", configuration: config) { benchmark in
+    Benchmark("Parse with Parse3339 (DateComponents)", configuration: config) { benchmark in
         let s = "2023-07-04T08:21:25+03:00"
         for _ in benchmark.scaledIterations {
             let parsed = parse(s)!
-            let parsedDate = parsed.date!
+            let dateComponents = parsed.dateComponents
+            let parsedDate = dateComponents.date!
+            blackHole(parsedDate)
+        }
+    }
+
+    Benchmark("Parse with Parse3339 (Unix time)", configuration: config) { benchmark in
+        let s = "2023-07-04T08:21:25+03:00"
+        for _ in benchmark.scaledIterations {
+            let parsed = parse(s)!
+            let parsedDate = parsed.date
             blackHole(parsedDate)
         }
     }

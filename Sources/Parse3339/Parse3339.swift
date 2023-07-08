@@ -48,6 +48,25 @@ public struct Parts {
         self.zone * 60
     }
 
+    public var date: Date {
+        var t = tm(
+            tm_sec: Int32(self.second),
+            tm_min: Int32(self.minute),
+            tm_hour: Int32(self.hour),
+            tm_mday: Int32(self.day),
+            tm_mon: Int32(self.month - 1),
+            tm_year: Int32(self.year - 1900),
+            tm_wday: 0,
+            tm_yday: 0,
+            tm_isdst: 0,
+            tm_gmtoff: 0,
+            tm_zone: nil
+        )
+        let timet = timegm(&t)
+        let offsetTimet = timet - self.zoneSeconds
+        return Date(timeIntervalSince1970: TimeInterval(offsetTimet))
+    }
+
     public var dateComponents: DateComponents {
         let d = DateComponents(
             calendar: calendar,
@@ -61,10 +80,6 @@ public struct Parts {
             nanosecond: self.nanosecond
         )
         return d
-    }
-
-    public var date: Date? {
-        calendar.date(from: self.dateComponents)
     }
 }
 
