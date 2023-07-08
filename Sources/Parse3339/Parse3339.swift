@@ -24,17 +24,29 @@ import Foundation
 private let calendar = Calendar(identifier: .gregorian)
 private let utc = TimeZone(secondsFromGMT: 0)
 
+/// `Parts` contains the parsed fields from a time stamp.
 public struct Parts {
+    /// The year.
     public let year: Int
+    /// The month (1–12).
     public let month: Int
+    /// The day (1–31).
     public let day: Int
+    /// The hour (0–23).
     public let hour: Int
+    /// The minute (0–59).
     public let minute: Int
+    /// The second (0–60).
     public let second: Int
+    /// Subsecond fraction. `03.1234` as the second and fraction results in `1234` in this field. See ``secondFractionDigits`` for
+    /// the number of digits after the period.
     public let secondFraction: Int
+    /// Number of subsecond fraction digits in the time stamp (0–10).
     public let secondFractionDigits: Int
+    /// Time zone in minutes (-1439–1439).
     public let zone: Int
 
+    /// The fractional second value in nanoseconds.
     public var nanosecond: Int {
         let multiplier = power10(self.secondFractionDigits)
         let nanoZeroes: Int = 9
@@ -44,10 +56,12 @@ public struct Parts {
         return leading * nanoMultiplier
     }
 
+    /// Time zone in seconds.
     public var zoneSeconds: Int {
         self.zone * 60
     }
 
+    /// Parts as a `Date` value.
     public var date: Date {
         var t = tm(
             tm_sec: Int32(self.second),
@@ -67,6 +81,7 @@ public struct Parts {
         return Date(timeIntervalSince1970: TimeInterval(offsetTimet))
     }
 
+    /// Parts as a `DateComponents` value.
     public var dateComponents: DateComponents {
         let d = DateComponents(
             calendar: calendar,
@@ -161,11 +176,17 @@ private struct ParseState {
     var count = 0
 }
 
+/// Parse a `StringProtocol` into ``Parts``.
+///
+/// - SeeAlso: ``parse(_:)-9on3x``
 @inlinable
 public func parse(_ string: some StringProtocol) -> Parts? {
     parse(string.utf8)
 }
 
+/// Parse a sequence of `UInt8` values into ``Parts``.
+///
+/// - SeeAlso: ``parse(_:)-89jso``
 public func parse(_ seq: some Sequence<UInt8>) -> Parts? {
     var state = ParseState()
 
