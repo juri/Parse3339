@@ -1,0 +1,26 @@
+name: build
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    build-macos:
+        runs-on: macos-13
+
+        steps:
+            - name: Set up Swift
+              uses: fwal/setup-swift@v1.23.0
+              with:
+                swift-version: 5.8
+
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Build
+              run: swift build
+
+            - name: Run tests
+              run: swift test
