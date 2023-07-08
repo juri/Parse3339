@@ -15,7 +15,7 @@ There's nothing to configure, and it's all in just file in case you want to copy
 Parse3339 is pleasantly fast and stingy with memory usage. The package has benchmarks:
 
 ```sh
-swift package benchmark --target ParserBenchmarks
+env PARSE3339_BENCHMARK=1 swift package benchmark --target ParserBenchmarks
 ```
 
 It has benchmarks that parse the same string using Foundation's `DateFormatter`, Foundation's `ISO8601DateFormatter`, Parse3339 creating a `Date` with Foundation's `DateComponents` and `Calendar`, and Parse3339 creating a `Date` with standard Unix functions.

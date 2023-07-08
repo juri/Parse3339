@@ -24,9 +24,8 @@ let package = Package(
     ]
 )
 
-#if os(macOS)
-if ProcessInfo.processInfo.isOperatingSystemAtLeast(.init(majorVersion: 13, minorVersion: 0, patchVersion: 0)) {
-    package.platforms = [.macOS(.v13)]
+if ProcessInfo.processInfo.environment["PARSE3339_BENCHMARK"] != nil {
+    package.platforms = [.macOS(.v13), .iOS(.v16)]
     package.targets += [
         .executableTarget(
             name: "ParserBenchmarks",
@@ -41,4 +40,4 @@ if ProcessInfo.processInfo.isOperatingSystemAtLeast(.init(majorVersion: 13, mino
         ),
     ]
 }
-#endif
+
