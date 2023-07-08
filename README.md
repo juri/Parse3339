@@ -1,3 +1,5 @@
+[![Build](https://github.com/juri/Parse3339/actions/workflows/build.yml/badge.svg)](https://github.com/juri/Parse3339/actions/workflows/build.yml)
+
 # Parse3339
 
 Parse3339 is a fast [RFC 3339] time stamp parser written in pure Swift.
