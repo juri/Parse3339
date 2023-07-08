@@ -6,7 +6,7 @@ final class Parse3339Tests: XCTestCase {
     // MARK: Digits
 
     func testParseDigitSmallerThanNumbers() throws {
-        XCTAssertNil(parseDigit(0x2f))
+        XCTAssertNil(parseDigit(0x2F))
     }
 
     func testParseDigitZero() throws {
@@ -18,15 +18,15 @@ final class Parse3339Tests: XCTestCase {
     }
 
     func testParseDigitLargerThanNumbers() throws {
-        XCTAssertNil(parseDigit(0x3a))
+        XCTAssertNil(parseDigit(0x3A))
     }
 
     // MARK: Full
-    
+
     func testFullPlusZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25.2+03:00"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -38,11 +38,11 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.zone, 180)
         XCTAssertEqual(parsed.nanosecond, 200_000_000)
     }
-    
+
     func testFullPlusZoneWithMinutesSuccessful() throws {
         let s = "2023-07-04T08:21:25.2+03:37"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -58,7 +58,7 @@ final class Parse3339Tests: XCTestCase {
     func testFullMinusZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25.2-03:00"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -74,7 +74,7 @@ final class Parse3339Tests: XCTestCase {
     func testFullMinusZoneWithMinutesSuccessful() throws {
         let s = "2023-07-04T08:21:25.2-03:14"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -90,7 +90,7 @@ final class Parse3339Tests: XCTestCase {
     func testFullZZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25.2Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -104,11 +104,11 @@ final class Parse3339Tests: XCTestCase {
     }
 
     // MARK: Without fractions
-    
+
     func testIntegralSecondsPlusZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25+03:00"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -128,7 +128,7 @@ final class Parse3339Tests: XCTestCase {
     func testIntegralSecondsPlusZoneWithMinutesSuccessful() throws {
         let s = "2023-07-04T08:21:25+03:37"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -147,7 +147,7 @@ final class Parse3339Tests: XCTestCase {
     func testIntegralSecondsMinusZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25-03:00"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -166,7 +166,7 @@ final class Parse3339Tests: XCTestCase {
     func testIntegralSecondsMinusZoneWithMinutesSuccessful() throws {
         let s = "2023-07-04T08:21:25-03:14"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -185,7 +185,7 @@ final class Parse3339Tests: XCTestCase {
     func testIntegralSecondsZZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 7)
         XCTAssertEqual(parsed.day, 4)
@@ -202,7 +202,7 @@ final class Parse3339Tests: XCTestCase {
     }
 
     // MARK: Truncated
-    
+
     func testTruncated() throws {
         let s = "2023-07-04T08:21:25Z"
         for i in 1 ... s.count {
@@ -210,18 +210,18 @@ final class Parse3339Tests: XCTestCase {
             XCTAssertNil(parse(truncated), "Expected nil when parsing '\(truncated)'")
         }
     }
-    
+
     // MARK: Field limits
-    
+
     func testZeroMonth() throws {
         let s = "2023-00-04T08:21:25Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testJanuary() throws {
         let s = "2023-01-04T08:21:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 1)
         XCTAssertEqual(parsed.day, 4)
@@ -232,11 +232,11 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testDecemberMonth() throws {
         let s = "2023-12-04T08:21:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 4)
@@ -247,21 +247,21 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testLargeMonth() throws {
         let s = "2023-13-04T08:21:25Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testZeroDay() throws {
         let s = "2023-12-00T08:21:25Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testFirstDay() throws {
         let s = "2023-12-01T08:21:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 1)
@@ -272,11 +272,11 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testThirtyFirstDay() throws {
         let s = "2023-12-31T08:21:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -287,16 +287,16 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testLargeDay() throws {
         let s = "2023-12-32T08:21:25Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testHour0() throws {
         let s = "2023-12-31T00:21:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -307,11 +307,11 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testHour23() throws {
         let s = "2023-12-31T23:21:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -322,16 +322,16 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testHour24() throws {
         let s = "2023-12-31T24:21:25Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testMinute0() throws {
         let s = "2023-12-31T09:00:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -342,11 +342,11 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testMinute1() throws {
         let s = "2023-12-31T09:01:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -357,11 +357,11 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testMinute59() throws {
         let s = "2023-12-31T09:01:25Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -372,16 +372,16 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testMinute60() throws {
         let s = "2023-12-31T09:60:25Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testSecond0() throws {
         let s = "2023-12-31T09:00:00Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -392,11 +392,11 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testSecond1() throws {
         let s = "2023-12-31T09:01:01Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -407,11 +407,11 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testSecond60() throws {
         let s = "2023-12-31T09:01:60Z"
         let parsed = try XCTUnwrap(parse(s))
-        
+
         XCTAssertEqual(parsed.year, 2023)
         XCTAssertEqual(parsed.month, 12)
         XCTAssertEqual(parsed.day, 31)
@@ -422,7 +422,7 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.secondFractionDigits, 0)
         XCTAssertEqual(parsed.zone, 0)
     }
-    
+
     func testSecond61() throws {
         let s = "2023-12-31T09:01:61Z"
         XCTAssertNil(parse(s))
@@ -514,27 +514,27 @@ final class Parse3339Tests: XCTestCase {
     }
 
     // MARK: Short fields
-    
+
     func testShortYear() throws {
         let s = "202-12-31T09:01:00Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testShortMonth() throws {
         let s = "2023-1-31T09:01:00Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testShortDay() throws {
         let s = "2023-01-3T09:01:00Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testShortHour() throws {
         let s = "2023-01-03T9:01:00Z"
         XCTAssertNil(parse(s))
     }
-    
+
     func testShortMinute() throws {
         let s = "2023-01-03T09:1:00Z"
         XCTAssertNil(parse(s))
@@ -606,8 +606,8 @@ final class Parse3339Tests: XCTestCase {
         isoFormatterUTC.formatOptions = .withInternetDateTime
         isoFormatterPlus.formatOptions = .withInternetDateTime
         isoFormatterMinus.formatOptions = .withInternetDateTime
-        isoFormatterPlus.timeZone = TimeZone(secondsFromGMT: 6_000)
-        isoFormatterMinus.timeZone = TimeZone(secondsFromGMT: -18_000)
+        isoFormatterPlus.timeZone = TimeZone(secondsFromGMT: 6000)
+        isoFormatterMinus.timeZone = TimeZone(secondsFromGMT: -18000)
 
         let formatters = [isoFormatterUTC, isoFormatterPlus, isoFormatterMinus]
 

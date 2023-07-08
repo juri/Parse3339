@@ -152,12 +152,12 @@ private func addDigit(_ num: Int, to target: Int) -> Int {
 
 enum Component: UInt8 {
     case n0 = 0x30
-    case colon = 0x3a
-    case dash = 0x2d
+    case colon = 0x3A
+    case dash = 0x2D
     case tee = 0x54
-    case plus = 0x2b
-    case period = 0x2e
-    case zed = 0x5a
+    case plus = 0x2B
+    case period = 0x2E
+    case zed = 0x5A
 }
 
 private struct ParseState {
