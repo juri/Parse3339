@@ -564,7 +564,7 @@ func parseInt<S>(_ seq: S) -> (Int?, S.Element?) where S: Sequence, S.Element: B
     return (outInt, nil)
 }
 
-func parseDigit(_ source: some BinaryInteger) -> Int? {
+private func parseDigit(_ source: some BinaryInteger) -> Int? {
     switch source as? UInt8 {
     case Component.n0.rawValue: return 0
     case Component.n1.rawValue: return 1
