@@ -76,17 +76,17 @@ func power10(_ n: Int) -> Int {
 }
 
 extension Parts {
-    init(_ zm: State.ZoneMinute) {
+    fileprivate init(_ ps: ParseState) {
         self.init(
-            year: zm.year,
-            month: zm.month,
-            day: zm.day,
-            hour: zm.hour,
-            minute: zm.minute,
-            second: zm.second,
-            secondFraction: zm.fraction,
-            secondFractionDigits: zm.fractionCount,
-            zone: zm.zoneDirection.multiplier * (zm.zoneHour * 60 + zm.zoneMinute)
+            year: ps.year,
+            month: ps.month,
+            day: ps.day,
+            hour: ps.hour,
+            minute: ps.minute,
+            second: ps.second,
+            secondFraction: ps.secondFraction,
+            secondFractionDigits: ps.secondFractionDigits,
+            zone: ps.zoneDirection.multiplier * (ps.zoneHour * 60 + ps.zoneMinute)
         )
     }
 }
@@ -103,252 +103,20 @@ enum ZoneDirection {
     }
 }
 
-enum State {
-    case year(year: Year, count: Int)
-    case month(month: Month, count: Int)
-    case day(day: Day, count: Int)
-    case hour(hour: Hour, count: Int)
-    case minute(minute: Minute, count: Int)
-    case second(second: Second, count: Int)
-    case secondFrac(frac: SecondFraction)
-    case zoneHour(zoneHour: ZoneHour, count: Int)
-    case zoneMinute(zoneMinute: ZoneMinute, count: Int)
-}
-
-extension State {
-    struct Year {
-        var year: Int
-    }
-
-    struct Month {
-        let year: Int
-        var month: Int
-    }
-
-    struct Day {
-        let year: Int
-        let month: Int
-        var day: Int
-    }
-
-    struct Hour {
-        let year: Int
-        let month: Int
-        let day: Int
-        var hour: Int
-    }
-
-    struct Minute {
-        let year: Int
-        let month: Int
-        let day: Int
-        let hour: Int
-        var minute: Int
-    }
-
-    struct Second {
-        let year: Int
-        let month: Int
-        let day: Int
-        let hour: Int
-        let minute: Int
-        var second: Int
-    }
-
-    struct SecondFraction {
-        let year: Int
-        let month: Int
-        let day: Int
-        let hour: Int
-        let minute: Int
-        let second: Int
-        var fraction: Int
-        var count: Int
-    }
-
-    struct ZoneHour {
-        let year: Int
-        let month: Int
-        let day: Int
-        let hour: Int
-        let minute: Int
-        let second: Int
-        let fraction: Int
-        let fractionCount: Int
-        let zoneDirection: ZoneDirection
-        var zoneHour: Int
-    }
-
-    struct ZoneMinute {
-        let year: Int
-        let month: Int
-        let day: Int
-        let hour: Int
-        let minute: Int
-        let second: Int
-        let fraction: Int
-        let fractionCount: Int
-        let zoneDirection: ZoneDirection
-        let zoneHour: Int
-        var zoneMinute: Int
-    }
+private enum Field {
+    case year
+    case month
+    case day
+    case hour
+    case minute
+    case second
+    case secondFrac
+    case zoneHour
+    case zoneMinute
 }
 
 private func addDigit(_ num: Int, to target: Int) -> Int {
     target * 10 + num
-}
-
-extension State.Year {
-    mutating func add(_ num: Int) {
-        self.year = addDigit(num, to: self.year)
-    }
-}
-
-extension State.Month {
-    init(_ year: State.Year) {
-        self.init(year: year.year, month: 0)
-    }
-
-    mutating func add(_ num: Int) {
-        self.month = addDigit(num, to: self.month)
-    }
-}
-
-extension State.Day {
-    init(_ month: State.Month) {
-        self.init(year: month.year, month: month.month, day: 0)
-    }
-
-    mutating func add(_ num: Int) {
-        self.day = addDigit(num, to: self.day)
-    }
-}
-
-extension State.Hour {
-    init(_ day: State.Day) {
-        self.init(year: day.year, month: day.month, day: day.day, hour: 0)
-    }
-
-    mutating func add(_ num: Int) {
-        self.hour = addDigit(num, to: self.hour)
-    }
-}
-
-extension State.Minute {
-    init(_ hour: State.Hour) {
-        self.init(year: hour.year, month: hour.month, day: hour.day, hour: hour.hour, minute: 0)
-    }
-
-    mutating func add(_ num: Int) {
-        self.minute = addDigit(num, to: self.minute)
-    }
-}
-
-extension State.Second {
-    init(_ minute: State.Minute) {
-        self.init(
-            year: minute.year, month: minute.month, day: minute.day, hour: minute.hour, minute: minute.minute, second: 0
-        )
-    }
-
-    mutating func add(_ num: Int) {
-        self.second = addDigit(num, to: self.second)
-    }
-}
-
-extension State.SecondFraction {
-    init(_ second: State.Second) {
-        self.init(
-            year: second.year,
-            month: second.month,
-            day: second.day,
-            hour: second.hour,
-            minute: second.minute,
-            second: second.second,
-            fraction: 0,
-            count: 0
-        )
-    }
-
-    mutating func add(_ num: Int) {
-        self.fraction = addDigit(num, to: self.fraction)
-        self.count += 1
-    }
-}
-
-extension State.ZoneHour {
-    init(_ frac: State.SecondFraction, direction: ZoneDirection) {
-        self.init(
-            year: frac.year,
-            month: frac.month,
-            day: frac.day,
-            hour: frac.hour,
-            minute: frac.minute,
-            second: frac.second,
-            fraction: frac.fraction,
-            fractionCount: frac.count,
-            zoneDirection: direction,
-            zoneHour: 0
-        )
-    }
-    
-    mutating func add(_ num: Int) {
-        self.zoneHour = addDigit(num, to: self.zoneHour)
-    }
-}
-
-extension State.ZoneMinute {
-    init(_ zh: State.ZoneHour) {
-        self.init(
-            year: zh.year,
-            month: zh.month,
-            day: zh.day,
-            hour: zh.hour,
-            minute: zh.minute,
-            second: zh.second,
-            fraction: zh.fraction,
-            fractionCount: zh.fractionCount,
-            zoneDirection: zh.zoneDirection,
-            zoneHour: zh.zoneHour,
-            zoneMinute: 0
-        )
-    }
-
-    init(_ s: State.Second) {
-        self.init(
-            year: s.year,
-            month: s.month,
-            day: s.day,
-            hour: s.hour,
-            minute: s.minute,
-            second: s.second,
-            fraction: 0,
-            fractionCount: 0,
-            zoneDirection: .plus,
-            zoneHour: 0,
-            zoneMinute: 0
-        )
-    }
-
-    init(_ f: State.SecondFraction) {
-        self.init(
-            year: f.year,
-            month: f.month,
-            day: f.day,
-            hour: f.hour,
-            minute: f.minute,
-            second: f.second,
-            fraction: f.fraction,
-            fractionCount: f.count,
-            zoneDirection: .plus,
-            zoneHour: 0,
-            zoneMinute: 0
-        )
-    }
-
-    mutating func add(_ num: Int) {
-        self.zoneMinute = addDigit(num, to: self.zoneMinute)
-    }
 }
 
 enum Component: UInt8 {
@@ -370,176 +138,202 @@ enum Component: UInt8 {
     case zed = 0x5a
 }
 
+private struct ParseState {
+    var field = Field.year
+    var year = 0
+    var month = 0
+    var day = 0
+    var hour = 0
+    var minute = 0
+    var second = 0
+    var secondFraction = 0
+    var secondFractionDigits = 0
+    var zoneDirection = ZoneDirection.plus
+    var zoneHour = 0
+    var zoneMinute = 0
+    var count = 0
+}
+
 @inlinable
 public func parse(_ string: some StringProtocol) -> Parts? {
     parse(string.utf8)
 }
 
 public func parse(_ seq: some Sequence<UInt8>) -> Parts? {
-    var state = State.year(year: State.Year(year: 0), count: 0)
+    var state = ParseState()
 
     for element in seq {
-        switch state {
-        case .year(year: var y, count: let c):
-            if c == 4 {
+        switch state.field {
+        case .year:
+            if state.count == 4 {
                 if element == Component.dash.rawValue {
-                    state = .month(month: State.Month(y), count: 0)
+                    state.field = .month
+                    state.count = 0
                 } else {
                     return nil
                 }
             } else if let num = parseDigit(element) {
-                y.add(num)
-                state = .year(year: y, count: c + 1)
-            } else {
-                return nil
-            }
-            
-        case .month(month: var m, count: let c):
-            if c == 2 {
-                if element == Component.dash.rawValue {
-                    guard checkMonth(m.month) else {
-                        return nil
-                    }
-                    state = .day(day: State.Day(m), count: 0)
-                } else {
-                    return nil
-                }
-            } else if let num = parseDigit(element) {
-                m.add(num)
-                state = .month(month: m, count: c + 1)
+                state.year = addDigit(num, to: state.year)
+                state.count += 1
             } else {
                 return nil
             }
 
-        case .day(day: var d, count: let c):
-            if c == 2 {
+        case .month:
+            if state.count == 2 {
+                if element == Component.dash.rawValue {
+                    guard checkMonth(state.month) else {
+                        return nil
+                    }
+                    state.field = .day
+                    state.count = 0
+                } else {
+                    return nil
+                }
+            } else if let num = parseDigit(element) {
+                state.month = addDigit(num, to: state.month)
+                state.count += 1
+            } else {
+                return nil
+            }
+
+        case .day:
+            if state.count == 2 {
                 if element == Component.tee.rawValue {
-                    guard checkDay(d.day) else {
+                    guard checkDay(state.day) else {
                         return nil
                     }
-                    state = .hour(hour: State.Hour(d), count: 0)
+                    state.field = .hour
+                    state.count = 0
                 } else {
                     return nil
                 }
             } else if let num = parseDigit(element) {
-                d.add(num)
-                state = .day(day: d, count: c + 1)
+                state.day = addDigit(num, to: state.day)
+                state.count += 1
             } else {
                 return nil
             }
 
-        case .hour(hour: var h, count: let c):
-            if c == 2 {
+        case .hour:
+            if state.count == 2 {
                 if element == Component.colon.rawValue {
-                    state = .minute(minute: State.Minute(h), count: 0)
+                    state.field = .minute
+                    state.count = 0
                 } else {
                     return nil
                 }
             } else if let num = parseDigit(element) {
-                h.add(num)
-                guard checkHour(h.hour) else {
+                state.hour = addDigit(num, to: state.hour)
+                guard checkHour(state.hour) else {
                     return nil
                 }
-                state = .hour(hour: h, count: c + 1)
+                state.count += 1
             } else {
                 return nil
             }
 
-        case .minute(minute: var m, count: let c):
-            if c == 2 {
+        case .minute:
+            if state.count == 2 {
                 if element == Component.colon.rawValue {
-                    state = .second(second: State.Second(m), count: 0)
+                    state.field = .second
+                    state.count = 0
                 } else {
                     return nil
                 }
             } else if let num = parseDigit(element) {
-                m.add(num)
-                guard checkMinute(m.minute) else {
+                state.minute = addDigit(num, to: state.minute)
+                guard checkMinute(state.minute) else {
                     return nil
                 }
-                state = .minute(minute: m, count: c + 1)
+                state.count += 1
             } else {
                 return nil
             }
 
-        case .second(second: var s, count: let c):
-            if c == 2 {
+        case .second:
+            if state.count == 2 {
                 if element == Component.period.rawValue {
-                    state = .secondFrac(frac: State.SecondFraction(s))
+                    state.field = .secondFrac
+                    state.count = 0
                 } else if element == Component.plus.rawValue {
-                    state = .zoneHour(zoneHour: State.ZoneHour(State.SecondFraction(s), direction: .plus), count: 0)
+                    state.field = .zoneHour
+                    state.zoneDirection = .plus
+                    state.count = 0
                 } else if element == Component.dash.rawValue {
-                    state = .zoneHour(zoneHour: State.ZoneHour(State.SecondFraction(s), direction: .minus), count: 0)
+                    state.field = .zoneHour
+                    state.zoneDirection = .minus
+                    state.count = 0
                 } else if element == Component.zed.rawValue {
-                    let zm = State.ZoneMinute(s)
-                    return Parts(zm)
+                    return Parts(state)
                 } else {
                     return nil
                 }
             } else if let num = parseDigit(element) {
-                s.add(num)
-                guard checkSecond(s.second) else {
+                state.second = addDigit(num, to: state.second)
+                guard checkSecond(state.second) else {
                     return nil
                 }
-                state = .second(second: s, count: c + 1)
+                state.count += 1
             } else {
                 return nil
             }
 
-        case .secondFrac(frac: var f):
+        case .secondFrac:
             if let num = parseDigit(element) {
-                if f.count >= 10 {
+                if state.secondFractionDigits >= 10 {
                     return nil
                 }
-                f.add(num)
-                state = .secondFrac(frac: f)
-            } else if f.count == 0 {
+                state.secondFraction = addDigit(num, to: state.secondFraction)
+                state.secondFractionDigits += 1
+            } else if state.secondFractionDigits == 0 {
                 return nil
             } else if element == Component.plus.rawValue {
-                state = .zoneHour(zoneHour: State.ZoneHour(f, direction: .plus), count: 0)
+                state.field = .zoneHour
             } else if element == Component.dash.rawValue {
-                state = .zoneHour(zoneHour: State.ZoneHour(f, direction: .minus), count: 0)
+                state.field = .zoneHour
+                state.zoneDirection = .minus
             } else if element == Component.zed.rawValue {
-                let zm = State.ZoneMinute(f)
-                return Parts(zm)
+                return Parts(state)
             } else {
                 return nil
             }
 
-        case .zoneHour(zoneHour: var zh, count: let c):
-            if c == 2 {
+        case .zoneHour:
+            if state.count == 2 {
                 if element == Component.colon.rawValue {
-                    state = .zoneMinute(zoneMinute: State.ZoneMinute(zh), count: 0)
+                    state.field = .zoneMinute
+                    state.count = 0
                 } else {
                     return nil
                 }
             } else if let num = parseDigit(element) {
-                zh.add(num)
-                guard checkHour(zh.zoneHour) else {
+                state.zoneHour = addDigit(num, to: state.zoneHour)
+                guard checkHour(state.zoneHour) else {
                     return nil
                 }
-                state = .zoneHour(zoneHour: zh, count: c + 1)
+                state.count += 1
             } else {
                 return nil
             }
 
-        case .zoneMinute(zoneMinute: var zm, count: let c):
-            if c == 2 {
-                return Parts(zm)
+        case .zoneMinute:
+            if state.count == 2 {
+                return Parts(state)
             } else if let num = parseDigit(element) {
-                zm.add(num)
-                guard checkMinute(zm.zoneMinute) else {
+                state.zoneMinute = addDigit(num, to: state.zoneMinute)
+                guard checkMinute(state.zoneMinute) else {
                     return nil
                 }
-                state = .zoneMinute(zoneMinute: zm, count: c + 1)
+                state.count += 1
             } else {
                 return nil
             }
         }
     }
 
-    if case let .zoneMinute(zoneMinute: zm, count: c) = state, c == 2 {
-        return Parts(zm)
+    if case .zoneMinute = state.field, state.count == 2 {
+        return Parts(state)
     }
     return nil
 }
