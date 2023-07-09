@@ -544,26 +544,6 @@ public func parse<S>(_ seq: S) -> Parts? where S: Sequence, S.Element == UInt8 {
     return nil
 }
 
-func parseInt<S>(_ seq: S) -> (Int?, S.Element?) where S: Sequence, S.Element: BinaryInteger {
-    var outInt: Int = 0
-    for value in seq.prefix(1) {
-        if let digit = parseDigit(value) {
-            outInt = digit
-            break
-        }
-        return (nil, value)
-    }
-    for value in seq {
-        if let digit = parseDigit(value) {
-            outInt *= 10
-            outInt += digit
-            break
-        }
-        return (outInt, value)
-    }
-    return (outInt, nil)
-}
-
 private func parseDigit(_ source: some BinaryInteger) -> Int? {
     switch source as? UInt8 {
     case Component.n0.rawValue: return 0
