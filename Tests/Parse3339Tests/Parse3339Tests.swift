@@ -3,6 +3,24 @@ import Foundation
 import XCTest
 
 final class Parse3339Tests: XCTestCase {
+    // MARK: Digits
+
+    func testParseDigitSmallerThanNumbers() throws {
+        XCTAssertNil(parseDigit(0x2f))
+    }
+
+    func testParseDigitZero() throws {
+        XCTAssertEqual(parseDigit(0x30), 0)
+    }
+
+    func testParseDigitNine() throws {
+        XCTAssertEqual(parseDigit(0x39), 9)
+    }
+
+    func testParseDigitLargerThanNumbers() throws {
+        XCTAssertNil(parseDigit(0x3a))
+    }
+
     // MARK: Full
     
     func testFullPlusZoneSuccessful() throws {
