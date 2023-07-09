@@ -19,6 +19,18 @@ The time stamp formats supported by Parse3339 are the following:
 
 See the RFC for the exact format specification.
 
+### Usage
+
+```swift
+let s = "2023-07-09T13:14:00+03:00"
+guard let parts = Parse3339.parse(s) else {
+    return
+}
+let date = parts.date
+print(date.timeIntervalSinceReferenceDate)
+// output: 710590440.0
+```
+
 ## Topics
 
 ### Parsing
