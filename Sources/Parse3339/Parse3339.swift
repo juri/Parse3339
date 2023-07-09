@@ -98,14 +98,6 @@ public struct Parts {
     }
 }
 
-func power10(_ n: Int) -> Int {
-    var out = 1
-    for _ in 0 ..< n {
-        out *= 10
-    }
-    return out
-}
-
 extension Parts {
     fileprivate init(_ ps: ParseState) {
         self.init(
@@ -393,4 +385,12 @@ private func checkMinute(_ minute: Int) -> Bool {
 
 private func checkSecond(_ second: Int) -> Bool {
     second >= 0 && second < 61
+}
+
+private func power10(_ n: Int) -> Int {
+    var out = 1
+    for _ in 0 ..< n {
+        out *= 10
+    }
+    return out
 }
