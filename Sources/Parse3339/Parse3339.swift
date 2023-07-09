@@ -114,7 +114,7 @@ extension Parts {
     }
 }
 
-enum ZoneDirection {
+private enum ZoneDirection {
     case plus
     case minus
 
@@ -142,7 +142,7 @@ private func addDigit(_ num: Int, to target: Int) -> Int {
     target * 10 + num
 }
 
-enum Component: UInt8 {
+private enum Component: UInt8 {
     case n0 = 0x30
     case colon = 0x3A
     case dash = 0x2D
