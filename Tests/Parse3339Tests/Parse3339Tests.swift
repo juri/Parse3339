@@ -596,6 +596,32 @@ final class Parse3339Tests: XCTestCase {
         let s = "2023-01-03T09:01:01+001:00"
         XCTAssertNil(parse(s))
     }
+
+    // MARK: Date generator
+
+    func testDateGen() throws {
+        let isoFormatterUTC = ISO8601DateFormatter()
+        let isoFormatterPlus = ISO8601DateFormatter()
+        let isoFormatterMinus = ISO8601DateFormatter()
+        isoFormatterUTC.formatOptions = .withInternetDateTime
+        isoFormatterPlus.formatOptions = .withInternetDateTime
+        isoFormatterMinus.formatOptions = .withInternetDateTime
+        isoFormatterPlus.timeZone = TimeZone(secondsFromGMT: 6_000)
+        isoFormatterMinus.timeZone = TimeZone(secondsFromGMT: -18_000)
+
+        let formatters = [isoFormatterUTC, isoFormatterPlus, isoFormatterMinus]
+
+        for timeInterval in stride(from: 0, to: 1_000_000_000, by: 100_000) {
+            for formatter in formatters {
+                let str = formatter.string(from: Date(timeIntervalSince1970: TimeInterval(timeInterval)))
+                let parsed = try XCTUnwrap(parse(str))
+                let unixDate = parsed.date
+                let dateComponents = parsed.dateComponents
+                let calendarDate = try XCTUnwrap(dateComponents.date)
+                XCTAssertEqual(calendarDate, unixDate)
+            }
+        }
+    }
 }
 
 let isoFormatter: ISO8601DateFormatter = {
