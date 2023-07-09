@@ -22,5 +22,15 @@ let benchmarks = {
             blackHole(fmtDate)
         }
     }
-}
 
+    Benchmark("Parse with DateFormatter", configuration: .init(maxDuration: .seconds(3))) { benchmark in
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+        let s = "2023-07-04T08:21:25+03:00"
+
+        for _ in benchmark.scaledIterations {
+            let fmtDate = dateFormatter.date(from: s)!
+            blackHole(fmtDate)
+        }
+    }
+}
