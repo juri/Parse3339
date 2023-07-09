@@ -24,6 +24,8 @@ import Foundation
 private let calendar = Calendar(identifier: .gregorian)
 private let utc = TimeZone(secondsFromGMT: 0)
 
+// MARK: Parts
+
 /// `Parts` contains the parsed fields from a time stamp.
 public struct Parts {
     /// The year.
@@ -114,59 +116,7 @@ extension Parts {
     }
 }
 
-private enum ZoneDirection {
-    case plus
-    case minus
-
-    var multiplier: Int {
-        switch self {
-        case .plus: return 1
-        case .minus: return -1
-        }
-    }
-}
-
-private enum Field {
-    case year
-    case month
-    case day
-    case hour
-    case minute
-    case second
-    case secondFrac
-    case zoneHour
-    case zoneMinute
-}
-
-private func addDigit(_ num: Int, to target: Int) -> Int {
-    target * 10 + num
-}
-
-private enum Component: UInt8 {
-    case n0 = 0x30
-    case colon = 0x3A
-    case dash = 0x2D
-    case tee = 0x54
-    case plus = 0x2B
-    case period = 0x2E
-    case zed = 0x5A
-}
-
-private struct ParseState {
-    var field = Field.year
-    var year = 0
-    var month = 0
-    var day = 0
-    var hour = 0
-    var minute = 0
-    var second = 0
-    var secondFraction = 0
-    var secondFractionDigits = 0
-    var zoneDirection = ZoneDirection.plus
-    var zoneHour = 0
-    var zoneMinute = 0
-    var count = 0
-}
+// MARK: Parse functions
 
 /// Parse a `StringProtocol` into ``Parts``.
 ///
@@ -356,6 +306,62 @@ public func parse(_ seq: some Sequence<UInt8>) -> Parts? {
         return Parts(state)
     }
     return nil
+}
+
+// MARK: - Private
+
+private enum ZoneDirection {
+    case plus
+    case minus
+
+    var multiplier: Int {
+        switch self {
+        case .plus: return 1
+        case .minus: return -1
+        }
+    }
+}
+
+private enum Field {
+    case year
+    case month
+    case day
+    case hour
+    case minute
+    case second
+    case secondFrac
+    case zoneHour
+    case zoneMinute
+}
+
+private func addDigit(_ num: Int, to target: Int) -> Int {
+    target * 10 + num
+}
+
+private enum Component: UInt8 {
+    case n0 = 0x30
+    case colon = 0x3A
+    case dash = 0x2D
+    case tee = 0x54
+    case plus = 0x2B
+    case period = 0x2E
+    case zed = 0x5A
+}
+
+private struct ParseState {
+    var field = Field.year
+    var year = 0
+    var month = 0
+    var day = 0
+    var hour = 0
+    var minute = 0
+    var second = 0
+    var secondFraction = 0
+    var secondFractionDigits = 0
+    var zoneDirection = ZoneDirection.plus
+    var zoneHour = 0
+    var zoneMinute = 0
+    var count = 0
 }
 
 func parseDigit(_ source: UInt8) -> Int? {
