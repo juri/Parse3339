@@ -429,7 +429,7 @@ final class Parse3339Tests: XCTestCase {
     }
 
     func testZoneHour0() throws {
-        let s = "2023-12-31T00:21:25+00:12Z"
+        let s = "2023-12-31T00:21:25+00:12"
         let parsed = try XCTUnwrap(parse(s))
 
         XCTAssertEqual(parsed.year, 2023)
