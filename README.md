@@ -17,6 +17,22 @@ There's nothing to configure, and it's all in just file in case you want to copy
 
 [RFC 3339]: https://www.rfc-editor.org/rfc/rfc3339
 
+## Usage
+
+```swift
+import Parse3339
+
+let s = "2023-07-09T13:14:00+03:00"
+guard let parts = Parse3339.parse(s) else {
+    return
+}
+let date = parts.date
+print(date.timeIntervalSinceReferenceDate)
+// output: 710590440.0
+```
+
+For `Package.swift` snippets and documentation, visit the [Swift Package Index page](https://swiftpackageindex.com/juri/Parse3339).
+
 ## Speed and memory usage
 
 Parse3339 is pleasantly fast and stingy with memory usage. The package has benchmarks:
