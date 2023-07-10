@@ -22,6 +22,8 @@ Note that the RFC specifies more allowed variations than this parser supports.
 ### Usage
 
 ```swift
+import Parse3339
+
 let s = "2023-07-09T13:14:00+03:00"
 guard let parts = Parse3339.parse(s) else {
     return
