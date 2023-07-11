@@ -43,3 +43,7 @@ print(date.timeIntervalSinceReferenceDate)
 ### Parser output
 
 - ``Parts``
+
+### Codable support
+
+- ``parseFromDecoder(_:)``

@@ -622,6 +622,46 @@ final class Parse3339Tests: XCTestCase {
             }
         }
     }
+
+    // MARK: Decodable
+
+    func testDecodable() throws {
+        struct Payload: Codable {
+            let message: String
+            let date: Date
+        }
+
+        let dateComponents = DateComponents(
+            timeZone: TimeZone(identifier: "Europe/Helsinki"),
+            year: 2023,
+            month: 7,
+            day: 11,
+            hour: 8,
+            minute: 49,
+            second: 0
+        )
+        let date = Calendar(identifier: .gregorian).date(from: dateComponents)!
+        let payload = Payload(message: "hello world", date: date)
+
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+
+        let json = try encoder.encode(payload)
+
+        var didCallParse = false
+        func wrappedParse(_ decoder: any Decoder) throws -> Date {
+            didCallParse = true
+            return try parseFromDecoder(decoder)
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .custom(wrappedParse(_:))
+        let decoded = try decoder.decode(Payload.self, from: json)
+
+        XCTAssertTrue(didCallParse)
+        XCTAssertEqual(decoded.message, "hello world")
+        XCTAssertEqual(decoded.date, date)
+    }
 }
 
 let isoFormatter: ISO8601DateFormatter = {
