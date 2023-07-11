@@ -308,6 +308,36 @@ public func parse(_ seq: some Sequence<UInt8>) -> Parts? {
     return nil
 }
 
+// MARK: JSONDecoder support
+
+/// Helper function for using Parse3339 with Codable types.
+///
+/// Use `parseFromDecoder(_:)` with a custom date decoding strategy. The mechanism depends on
+/// the `TopLevelDecoder` implementation. With `JSONDecoder` you can use the `dateDecodingStrategy`
+/// property with a `custom` value like this:
+///
+/// ```swift
+/// let decoder = JSONDecoder()
+/// decoder.dateDecodingStrategy = .custom(Parse3339.parseFromDecoder(_:))
+/// ```
+///
+/// `parseFromDecoder` first decodes a `String` and then parses the string. For formats other than JSON you may get
+/// better performance by using an implementation that feeds bytes to ``parse(_:)-9on3x``.
+public func parseFromDecoder(_ decoder: some Decoder) throws -> Date {
+    let container = try decoder.singleValueContainer()
+    let str = try container.decode(String.self)
+    guard let parsed = parse(str) else {
+        throw DecodingError.typeMismatch(
+            Date.self,
+            DecodingError.Context(
+                codingPath: [],
+                debugDescription: "The string '\(str)' could not be parsed as a date"
+            )
+        )
+    }
+    return parsed.date
+}
+
 // MARK: - Private
 
 private enum ZoneDirection {
