@@ -31,6 +31,15 @@ print(date.timeIntervalSinceReferenceDate)
 // output: 710590440.0
 ```
 
+There's a helper function you can use with Foundation's `JSONDecoder`:
+
+```swift
+import Parse3339
+
+let decoder = JSONDecoder()
+decoder.dateDecodingStrategy = .custom(Parse3339.parseFromDecoder(_:))
+```
+
 For `Package.swift` snippets and documentation, visit the [Swift Package Index page](https://swiftpackageindex.com/juri/Parse3339).
 
 ## Speed and memory usage
