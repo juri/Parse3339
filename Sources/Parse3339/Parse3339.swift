@@ -50,12 +50,8 @@ public struct Parts {
 
     /// The fractional second value in nanoseconds.
     public var nanosecond: Int {
-        let multiplier = power10(self.secondFractionDigits)
         let nanoZeroes: Int = 9
-        let leading = self.secondFraction * multiplier
-        let missingDigits = nanoZeroes - self.secondFractionDigits - 1
-        let nanoMultiplier = power10(missingDigits)
-        return leading * nanoMultiplier
+        return secondFraction * power10(nanoZeroes - secondFractionDigits)
     }
 
     /// Time zone in seconds.
