@@ -51,7 +51,7 @@ public struct Parts {
     /// The fractional second value in nanoseconds.
     public var nanosecond: Int {
         let nanoZeroes: Int = 9
-        return secondFraction * power10(nanoZeroes - secondFractionDigits)
+        return self.secondFraction * power10(nanoZeroes - self.secondFractionDigits)
     }
 
     /// Time zone in seconds.
