@@ -2,7 +2,11 @@ import Benchmark
 import Foundation
 import Parse3339
 
-let config = Benchmark.Configuration(maxDuration: .seconds(30), maxIterations: 100_000)
+let config = Benchmark.Configuration(
+    timeUnits: .nanoseconds,
+    maxDuration: .seconds(30),
+    maxIterations: 100_000
+)
 
 let benchmarks = {
     Benchmark("Parse with Parse3339 (DateComponents)", configuration: config) { benchmark in
