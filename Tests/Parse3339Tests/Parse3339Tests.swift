@@ -144,6 +144,25 @@ final class Parse3339Tests: XCTestCase {
         XCTAssertEqual(parsed.dateComponents.date!.timeIntervalSince1970, unixTime, accuracy: 0.000001)
     }
 
+    func testFullZZoneToDateWithNanosecondsSuccessful() throws {
+        let s = "2023-07-04T08:21:25.295729572Z"
+        let parsed = try XCTUnwrap(parse(s))
+
+        XCTAssertEqual(parsed.year, 2023)
+        XCTAssertEqual(parsed.month, 7)
+        XCTAssertEqual(parsed.day, 4)
+        XCTAssertEqual(parsed.hour, 8)
+        XCTAssertEqual(parsed.minute, 21)
+        XCTAssertEqual(parsed.second, 25)
+        XCTAssertEqual(parsed.secondFraction, 295_729_572)
+        XCTAssertEqual(parsed.secondFractionDigits, 9)
+        XCTAssertEqual(parsed.zone, 0)
+        XCTAssertEqual(parsed.nanosecond, 295_729_572)
+
+        let unixTime = 1_688_458_885.295729572
+        XCTAssertEqual(parsed.date.timeIntervalSince1970, unixTime, accuracy: 0.000000001)
+    }
+
     func testFullZZoneWithNanosecondsSuccessful() throws {
         let s = "2023-07-04T08:21:25.295729572Z"
         let parsed = try XCTUnwrap(parse(s))
