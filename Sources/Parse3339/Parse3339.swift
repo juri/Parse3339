@@ -76,7 +76,9 @@ public struct Parts {
         )
         let timet = timegm(&t)
         let offsetTimet = timet - self.zoneSeconds
-        return Date(timeIntervalSince1970: TimeInterval(offsetTimet))
+        var timeInterval = TimeInterval(offsetTimet)
+        timeInterval += TimeInterval(self.nanosecond) / 1_000_000_000
+        return Date(timeIntervalSince1970: timeInterval)
     }
 
     /// Parts as a `DateComponents` value.
