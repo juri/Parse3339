@@ -27,7 +27,7 @@ private let utc = TimeZone(secondsFromGMT: 0)
 // MARK: Parts
 
 /// `Parts` contains the parsed fields from a time stamp.
-public struct Parts {
+public struct Parts: Sendable {
     /// The year.
     public let year: Int
     /// The month (1–12).
