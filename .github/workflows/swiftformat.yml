@@ -11,7 +11,7 @@ jobs:
   SwiftFormat:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Swift
         uses: fwal/setup-swift@v1.23.0
