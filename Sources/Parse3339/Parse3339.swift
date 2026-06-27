@@ -116,21 +116,44 @@ extension Parts {
 
 // MARK: Parse functions
 
-/// Parse a `StringProtocol` into ``Parts``.
+/// Parse a `String` into ``Parts``.
 ///
-/// - SeeAlso: ``parse(_:)-9on3x``
+/// - SeeAlso: Parse a `Substring` with ``parse(_:)-(Substring)`` or a `Span<UInt8>` with ``parse(_:)-(Span<UInt8>)``.
 @inlinable
-public func parse(_ string: some StringProtocol) -> Parts? {
-    parse(string.utf8)
+public func parse(_ string: String) -> Parts? {
+    var string = string
+    return string.withUTF8 { buffer in
+        let span = buffer.span
+        return parse(span)
+    }
 }
 
-/// Parse a sequence of `UInt8` values into ``Parts``.
+/// Parse a `Substring` into ``Parts``.
 ///
-/// - SeeAlso: ``parse(_:)-89jso``
-public func parse(_ seq: some Sequence<UInt8>) -> Parts? {
-    var state = ParseState()
+/// - SeeAlso: Parse a `String` with ``parse(_:)-(String)`` or a `Span<UInt8>` with ``parse(_:)-(Span<UInt8>)``.
+@inlinable
+public func parse(_ substring: Substring) -> Parts? {
+    var substring = substring
+    return substring.withUTF8 { buffer in
+        let span = buffer.span
+        return parse(span)
+    }
+}
 
-    for element in seq {
+private enum ByteResult {
+    case complete
+    case incomplete
+    case failure
+}
+
+/// Parse a `Span` of `UInt8` values into ``Parts``.
+///
+/// - SeeAlso: Parse a `String` with ``parse(_:)-(String)`` or a `Substring` with ``parse(_:)-(Substring)``.
+public func parse(_ span: Span<UInt8>) -> Parts? {
+    var state = ParseState()
+    for index in span.indices {
+        let element = span[index]
+
         switch state.field {
         case .year:
             if state.count == 4 {
@@ -320,7 +343,7 @@ public func parse(_ seq: some Sequence<UInt8>) -> Parts? {
 /// ```
 ///
 /// `parseFromDecoder` first decodes a `String` and then parses the string. For formats other than JSON you may get
-/// better performance by using an implementation that feeds bytes to ``parse(_:)-9on3x``.
+/// better performance by using an implementation that feeds bytes to ``parse(_:)-(Span<UInt8>)``;
 public func parseFromDecoder(_ decoder: some Decoder) throws -> Date {
     let container = try decoder.singleValueContainer()
     let str = try container.decode(String.self)

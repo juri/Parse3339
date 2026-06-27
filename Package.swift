@@ -6,6 +6,7 @@ import PackageDescription
 
 let package = Package(
     name: "Parse3339",
+    platforms: [.macOS(.v15), .iOS(.v16)],
     products: [
         .library(
             name: "Parse3339",
@@ -29,7 +30,6 @@ let package = Package(
 )
 
 if ProcessInfo.processInfo.environment["PARSE3339_BENCHMARK"] != nil {
-    package.platforms = [.macOS(.v26), .iOS(.v16)]
     package.targets += [
         .executableTarget(
             name: "ParserBenchmarks",
