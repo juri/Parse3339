@@ -9,13 +9,13 @@ on:
 
 jobs:
     build-macos:
-        runs-on: macos-13
+        runs-on: macos-26
 
         steps:
             - name: Set up Swift
-              uses: swift-actions/setup-swift@v2
+              uses: swift-actions/setup-swift@v3
               with:
-                swift-version: "5.10.1"
+                swift-version: "6.3.2"
 
             - name: Checkout
               uses: actions/checkout@v4
