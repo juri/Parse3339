@@ -2,13 +2,15 @@ import Benchmark
 import Foundation
 import Parse3339
 
-let config = Benchmark.Configuration(
-    timeUnits: .nanoseconds,
-    maxDuration: .seconds(30),
-    maxIterations: 100_000,
-)
+var config: Benchmark.Configuration {
+    Benchmark.Configuration(
+        timeUnits: .nanoseconds,
+        maxDuration: .seconds(30),
+        maxIterations: 100_000,
+    )
+}
 
-let benchmarks = {
+let benchmarks: @Sendable () -> Void = {
     Benchmark("Parse with Parse3339 (DateComponents)", configuration: config) { benchmark in
         let s = "2023-07-04T08:21:25+03:00"
         for _ in benchmark.scaledIterations {

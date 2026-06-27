@@ -13,7 +13,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/ordo-one/package-benchmark", .upToNextMajor(from: "1.6.5")),
+        .package(url: "https://github.com/ordo-one/benchmark", .upToNextMajor(from: "1.35.0")),
     ],
     targets: [
         .target(name: "Parse3339"),
@@ -25,17 +25,17 @@ let package = Package(
 )
 
 if ProcessInfo.processInfo.environment["PARSE3339_BENCHMARK"] != nil {
-    package.platforms = [.macOS(.v13), .iOS(.v16)]
+    package.platforms = [.macOS(.v26), .iOS(.v16)]
     package.targets += [
         .executableTarget(
             name: "ParserBenchmarks",
             dependencies: [
-                .product(name: "Benchmark", package: "package-benchmark"),
+                .product(name: "Benchmark", package: "benchmark"),
                 "Parse3339",
             ],
             path: "Benchmarks/ParserBenchmarks",
             plugins: [
-                .plugin(name: "BenchmarkPlugin", package: "package-benchmark"),
+                .plugin(name: "BenchmarkPlugin", package: "benchmark"),
             ],
         ),
     ]
