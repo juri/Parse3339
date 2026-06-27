@@ -72,6 +72,6 @@
 --octalgrouping 4,8
 --self insert
 --stripunusedargs closure-only
---swiftversion 5.8
+--swiftversion 6.3
 --wraparguments before-first
 --wrapcollections before-first

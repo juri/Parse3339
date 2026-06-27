@@ -72,7 +72,7 @@ public struct Parts: Sendable {
             tm_yday: 0,
             tm_isdst: 0,
             tm_gmtoff: 0,
-            tm_zone: nil
+            tm_zone: nil,
         )
         let timet = timegm(&t)
         let offsetTimet = timet - self.zoneSeconds
@@ -92,7 +92,7 @@ public struct Parts: Sendable {
             hour: self.hour,
             minute: self.minute,
             second: self.second,
-            nanosecond: self.nanosecond
+            nanosecond: self.nanosecond,
         )
         return d
     }
@@ -109,7 +109,7 @@ extension Parts {
             second: ps.second,
             secondFraction: ps.secondFraction,
             secondFractionDigits: ps.secondFractionDigits,
-            zone: ps.zoneDirection.multiplier * (ps.zoneHour * 60 + ps.zoneMinute)
+            zone: ps.zoneDirection.multiplier * (ps.zoneHour * 60 + ps.zoneMinute),
         )
     }
 }
@@ -329,8 +329,8 @@ public func parseFromDecoder(_ decoder: some Decoder) throws -> Date {
             Date.self,
             DecodingError.Context(
                 codingPath: [],
-                debugDescription: "The string '\(str)' could not be parsed as a date"
-            )
+                debugDescription: "The string '\(str)' could not be parsed as a date",
+            ),
         )
     }
     return parsed.date

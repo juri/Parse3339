@@ -717,7 +717,7 @@ final class Parse3339Tests: XCTestCase {
             day: 11,
             hour: 8,
             minute: 49,
-            second: 0
+            second: 0,
         )
         let date = Calendar(identifier: .gregorian).date(from: dateComponents)!
         let payload = Payload(message: "hello world", date: date)

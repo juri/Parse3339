@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "Parse3339",
-            targets: ["Parse3339"]
+            targets: ["Parse3339"],
         ),
     ],
     dependencies: [
@@ -19,9 +19,9 @@ let package = Package(
         .target(name: "Parse3339"),
         .testTarget(
             name: "Parse3339Tests",
-            dependencies: ["Parse3339"]
+            dependencies: ["Parse3339"],
         ),
-    ]
+    ],
 )
 
 if ProcessInfo.processInfo.environment["PARSE3339_BENCHMARK"] != nil {
@@ -36,7 +36,7 @@ if ProcessInfo.processInfo.environment["PARSE3339_BENCHMARK"] != nil {
             path: "Benchmarks/ParserBenchmarks",
             plugins: [
                 .plugin(name: "BenchmarkPlugin", package: "package-benchmark"),
-            ]
+            ],
         ),
     ]
 }
