@@ -34,7 +34,7 @@
         redundantSelf,\
         redundantVoidReturnType,\
         semicolons,\
-        sortedImports,\
+        sortImports,\
         spaceAroundBraces,\
         spaceAroundBrackets,\
         spaceAroundComments,\
