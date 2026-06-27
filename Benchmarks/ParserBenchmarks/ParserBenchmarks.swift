@@ -5,6 +5,10 @@ import Parse3339
 var config: Benchmark.Configuration {
     Benchmark.Configuration(
         timeUnits: .nanoseconds,
+        units: [
+            .instructions: .kilo,
+            .mallocBytesCount: .count,
+        ],
         maxDuration: .seconds(30),
         maxIterations: 100_000,
     )
