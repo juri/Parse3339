@@ -1,5 +1,6 @@
 import Foundation
 @testable import Parse3339
+import Synchronization
 import XCTest
 
 final class Parse3339Tests: XCTestCase {
@@ -727,9 +728,10 @@ final class Parse3339Tests: XCTestCase {
 
         let json = try encoder.encode(payload)
 
-        var didCallParse = false
+        let didCallParse = Mutex<Bool>(false)
+        @Sendable
         func wrappedParse(_ decoder: any Decoder) throws -> Date {
-            didCallParse = true
+            didCallParse.withLock { $0 = true }
             return try parseFromDecoder(decoder)
         }
 
@@ -737,14 +739,14 @@ final class Parse3339Tests: XCTestCase {
         decoder.dateDecodingStrategy = .custom(wrappedParse(_:))
         let decoded = try decoder.decode(Payload.self, from: json)
 
-        XCTAssertTrue(didCallParse)
+        XCTAssertTrue(didCallParse.withLock { $0 })
         XCTAssertEqual(decoded.message, "hello world")
         XCTAssertEqual(decoded.date, date)
     }
 }
 
-let isoFormatter: ISO8601DateFormatter = {
+var isoFormatter: ISO8601DateFormatter {
     let fmt = ISO8601DateFormatter()
     fmt.formatOptions = .withInternetDateTime
     return fmt
-}()
+}
