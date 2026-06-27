@@ -1,685 +1,686 @@
 import Foundation
+import Numerics
 @testable import Parse3339
 import Synchronization
-import XCTest
+import Testing
 
-final class Parse3339Tests: XCTestCase {
+@Suite struct Parse3339Tests {
     // MARK: Digits
 
-    func testParseDigitSmallerThanNumbers() throws {
-        XCTAssertNil(parseDigit(0x2F))
+    @Test func parseDigitSmallerThanNumbers() throws {
+        #expect(parseDigit(0x2F) == nil)
     }
 
-    func testParseDigitZero() throws {
-        XCTAssertEqual(parseDigit(0x30), 0)
+    @Test func parseDigitZero() throws {
+        #expect(parseDigit(0x30) == 0)
     }
 
-    func testParseDigitNine() throws {
-        XCTAssertEqual(parseDigit(0x39), 9)
+    @Test func parseDigitNine() throws {
+        #expect(parseDigit(0x39) == 9)
     }
 
-    func testParseDigitLargerThanNumbers() throws {
-        XCTAssertNil(parseDigit(0x3A))
+    @Test func parseDigitLargerThanNumbers() throws {
+        #expect(parseDigit(0x3A) == nil)
     }
 
     // MARK: Full
 
-    func testFullPlusZoneSuccessful() throws {
+    @Test func fullPlusZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25.2+03:00"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 2)
-        XCTAssertEqual(parsed.secondFractionDigits, 1)
-        XCTAssertEqual(parsed.zone, 180)
-        XCTAssertEqual(parsed.nanosecond, 200_000_000)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 2)
+        #expect(parsed.secondFractionDigits == 1)
+        #expect(parsed.zone == 180)
+        #expect(parsed.nanosecond == 200_000_000)
     }
 
-    func testFullPlusZoneWithMinutesSuccessful() throws {
+    @Test func fullPlusZoneWithMinutesSuccessful() throws {
         let s = "2023-07-04T08:21:25.2+03:37"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 2)
-        XCTAssertEqual(parsed.secondFractionDigits, 1)
-        XCTAssertEqual(parsed.zone, 217)
-        XCTAssertEqual(parsed.nanosecond, 200_000_000)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 2)
+        #expect(parsed.secondFractionDigits == 1)
+        #expect(parsed.zone == 217)
+        #expect(parsed.nanosecond == 200_000_000)
     }
 
-    func testFullMinusZoneSuccessful() throws {
+    @Test func fullMinusZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25.2-03:00"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 2)
-        XCTAssertEqual(parsed.secondFractionDigits, 1)
-        XCTAssertEqual(parsed.zone, -180)
-        XCTAssertEqual(parsed.nanosecond, 200_000_000)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 2)
+        #expect(parsed.secondFractionDigits == 1)
+        #expect(parsed.zone == -180)
+        #expect(parsed.nanosecond == 200_000_000)
     }
 
-    func testFullMinusZoneWithMinutesSuccessful() throws {
+    @Test func fullMinusZoneWithMinutesSuccessful() throws {
         let s = "2023-07-04T08:21:25.2-03:14"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 2)
-        XCTAssertEqual(parsed.secondFractionDigits, 1)
-        XCTAssertEqual(parsed.zone, -194)
-        XCTAssertEqual(parsed.nanosecond, 200_000_000)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 2)
+        #expect(parsed.secondFractionDigits == 1)
+        #expect(parsed.zone == -194)
+        #expect(parsed.nanosecond == 200_000_000)
     }
 
-    func testFullZZoneSuccessful() throws {
+    @Test func fullZZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25.2Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 2)
-        XCTAssertEqual(parsed.secondFractionDigits, 1)
-        XCTAssertEqual(parsed.zone, 0)
-        XCTAssertEqual(parsed.nanosecond, 200_000_000)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 2)
+        #expect(parsed.secondFractionDigits == 1)
+        #expect(parsed.zone == 0)
+        #expect(parsed.nanosecond == 200_000_000)
 
         let unixTime = 1_688_458_885.2
-        XCTAssertEqual(parsed.dateComponents.date!.timeIntervalSince1970, unixTime, accuracy: 0.1)
+        #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
-    func testFullZZoneWithMillisecondsSuccessful() throws {
+    @Test func fullZZoneWithMillisecondsSuccessful() throws {
         let s = "2023-07-04T08:21:25.295Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 295)
-        XCTAssertEqual(parsed.secondFractionDigits, 3)
-        XCTAssertEqual(parsed.zone, 0)
-        XCTAssertEqual(parsed.nanosecond, 295_000_000)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 295)
+        #expect(parsed.secondFractionDigits == 3)
+        #expect(parsed.zone == 0)
+        #expect(parsed.nanosecond == 295_000_000)
 
         let unixTime = 1_688_458_885.295
-        XCTAssertEqual(parsed.dateComponents.date!.timeIntervalSince1970, unixTime, accuracy: 0.001)
+        #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
-    func testFullZZoneWithMicrosecondsSuccessful() throws {
+    @Test func fullZZoneWithMicrosecondsSuccessful() throws {
         let s = "2023-07-04T08:21:25.295729Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 295_729)
-        XCTAssertEqual(parsed.secondFractionDigits, 6)
-        XCTAssertEqual(parsed.zone, 0)
-        XCTAssertEqual(parsed.nanosecond, 295_729_000)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 295_729)
+        #expect(parsed.secondFractionDigits == 6)
+        #expect(parsed.zone == 0)
+        #expect(parsed.nanosecond == 295_729_000)
 
         let unixTime = 1_688_458_885.295729
-        XCTAssertEqual(parsed.dateComponents.date!.timeIntervalSince1970, unixTime, accuracy: 0.000001)
+        #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
-    func testFullZZoneToDateWithNanosecondsSuccessful() throws {
+    @Test func fullZZoneToDateWithNanosecondsSuccessful() throws {
         let s = "2023-07-04T08:21:25.295729572Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 295_729_572)
-        XCTAssertEqual(parsed.secondFractionDigits, 9)
-        XCTAssertEqual(parsed.zone, 0)
-        XCTAssertEqual(parsed.nanosecond, 295_729_572)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 295_729_572)
+        #expect(parsed.secondFractionDigits == 9)
+        #expect(parsed.zone == 0)
+        #expect(parsed.nanosecond == 295_729_572)
 
         let unixTime = 1_688_458_885.295729572
-        XCTAssertEqual(parsed.date.timeIntervalSince1970, unixTime, accuracy: 0.000000001)
+        #expect(parsed.date.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
-    func testFullZZoneWithNanosecondsSuccessful() throws {
+    @Test func fullZZoneWithNanosecondsSuccessful() throws {
         let s = "2023-07-04T08:21:25.295729572Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 295_729_572)
-        XCTAssertEqual(parsed.secondFractionDigits, 9)
-        XCTAssertEqual(parsed.zone, 0)
-        XCTAssertEqual(parsed.nanosecond, 295_729_572)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 295_729_572)
+        #expect(parsed.secondFractionDigits == 9)
+        #expect(parsed.zone == 0)
+        #expect(parsed.nanosecond == 295_729_572)
 
         let unixTime = 1_688_458_885.295729572
-        XCTAssertEqual(parsed.dateComponents.date!.timeIntervalSince1970, unixTime, accuracy: 0.000000001)
+        #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
     // MARK: Without fractions
 
-    func testIntegralSecondsPlusZoneSuccessful() throws {
+    @Test func integralSecondsPlusZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25+03:00"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 180)
-        XCTAssertEqual(parsed.nanosecond, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 180)
+        #expect(parsed.nanosecond == 0)
 
-        let fmtDate = try XCTUnwrap(isoFormatter.date(from: s))
-        let parsedDate = try XCTUnwrap(parsed.date)
-        XCTAssertEqual(fmtDate, parsedDate)
+        let fmtDate = try #require(isoFormatter.date(from: s))
+        let parsedDate = parsed.date
+        #expect(fmtDate == parsedDate)
     }
 
-    func testIntegralSecondsPlusZoneWithMinutesSuccessful() throws {
+    @Test func integralSecondsPlusZoneWithMinutesSuccessful() throws {
         let s = "2023-07-04T08:21:25+03:37"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 217)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 217)
 
-        let fmtDate = try XCTUnwrap(isoFormatter.date(from: s))
-        let parsedDate = try XCTUnwrap(parsed.date)
-        XCTAssertEqual(fmtDate, parsedDate)
+        let fmtDate = try #require(isoFormatter.date(from: s))
+        let parsedDate = parsed.date
+        #expect(fmtDate == parsedDate)
     }
 
-    func testIntegralSecondsMinusZoneSuccessful() throws {
+    @Test func integralSecondsMinusZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25-03:00"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, -180)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == -180)
 
-        let fmtDate = try XCTUnwrap(isoFormatter.date(from: s))
-        let parsedDate = try XCTUnwrap(parsed.date)
-        XCTAssertEqual(fmtDate, parsedDate)
+        let fmtDate = try #require(isoFormatter.date(from: s))
+        let parsedDate = parsed.date
+        #expect(fmtDate == parsedDate)
     }
 
-    func testIntegralSecondsMinusZoneWithMinutesSuccessful() throws {
+    @Test func integralSecondsMinusZoneWithMinutesSuccessful() throws {
         let s = "2023-07-04T08:21:25-03:14"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, -194)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == -194)
 
-        let fmtDate = try XCTUnwrap(isoFormatter.date(from: s))
-        let parsedDate = try XCTUnwrap(parsed.date)
-        XCTAssertEqual(fmtDate, parsedDate)
+        let fmtDate = try #require(isoFormatter.date(from: s))
+        let parsedDate = parsed.date
+        #expect(fmtDate == parsedDate)
     }
 
-    func testIntegralSecondsZZoneSuccessful() throws {
+    @Test func integralSecondsZZoneSuccessful() throws {
         let s = "2023-07-04T08:21:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 7)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 7)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
 
-        let fmtDate = try XCTUnwrap(isoFormatter.date(from: s))
-        let parsedDate = try XCTUnwrap(parsed.date)
-        XCTAssertEqual(fmtDate, parsedDate)
+        let fmtDate = try #require(isoFormatter.date(from: s))
+        let parsedDate = parsed.date
+        #expect(fmtDate == parsedDate)
     }
 
     // MARK: Truncated
 
-    func testTruncated() throws {
+    @Test func truncated() throws {
         let s = "2023-07-04T08:21:25Z"
         for i in 1 ... s.count {
             let truncated = s.dropLast(i)
-            XCTAssertNil(parse(truncated), "Expected nil when parsing '\(truncated)'")
+            #expect(parse(truncated) == nil, "Expected nil when parsing '\(truncated)'")
         }
     }
 
     // MARK: Field limits
 
-    func testZeroMonth() throws {
+    @Test func zeroMonth() throws {
         let s = "2023-00-04T08:21:25Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testJanuary() throws {
+    @Test func january() throws {
         let s = "2023-01-04T08:21:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 1)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 1)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testDecemberMonth() throws {
+    @Test func decemberMonth() throws {
         let s = "2023-12-04T08:21:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 4)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 4)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testLargeMonth() throws {
+    @Test func largeMonth() throws {
         let s = "2023-13-04T08:21:25Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testZeroDay() throws {
+    @Test func zeroDay() throws {
         let s = "2023-12-00T08:21:25Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testFirstDay() throws {
+    @Test func firstDay() throws {
         let s = "2023-12-01T08:21:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 1)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 1)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testThirtyFirstDay() throws {
+    @Test func thirtyFirstDay() throws {
         let s = "2023-12-31T08:21:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 8)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 8)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testLargeDay() throws {
+    @Test func largeDay() throws {
         let s = "2023-12-32T08:21:25Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testHour0() throws {
+    @Test func hour0() throws {
         let s = "2023-12-31T00:21:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 0)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 0)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testHour23() throws {
+    @Test func hour23() throws {
         let s = "2023-12-31T23:21:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 23)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 23)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testHour24() throws {
+    @Test func hour24() throws {
         let s = "2023-12-31T24:21:25Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testMinute0() throws {
+    @Test func minute0() throws {
         let s = "2023-12-31T09:00:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 0)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 0)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testMinute1() throws {
+    @Test func minute1() throws {
         let s = "2023-12-31T09:01:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 1)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 1)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testMinute59() throws {
+    @Test func minute59() throws {
         let s = "2023-12-31T09:01:25Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 1)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 1)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testMinute60() throws {
+    @Test func minute60() throws {
         let s = "2023-12-31T09:60:25Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testSecond0() throws {
+    @Test func second0() throws {
         let s = "2023-12-31T09:00:00Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 0)
-        XCTAssertEqual(parsed.second, 0)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 0)
+        #expect(parsed.second == 0)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testSecond1() throws {
+    @Test func second1() throws {
         let s = "2023-12-31T09:01:01Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 1)
-        XCTAssertEqual(parsed.second, 1)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 1)
+        #expect(parsed.second == 1)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testSecond60() throws {
+    @Test func second60() throws {
         let s = "2023-12-31T09:01:60Z"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 1)
-        XCTAssertEqual(parsed.second, 60)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 0)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 1)
+        #expect(parsed.second == 60)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 0)
     }
 
-    func testSecond61() throws {
+    @Test func second61() throws {
         let s = "2023-12-31T09:01:61Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testZoneHour0() throws {
+    @Test func zoneHour0() throws {
         let s = "2023-12-31T00:21:25+00:12"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 0)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 12)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 0)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 12)
     }
 
-    func testZoneHour23() throws {
+    @Test func zoneHour23() throws {
         let s = "2023-12-31T23:21:25+23:03"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 23)
-        XCTAssertEqual(parsed.minute, 21)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 1383)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 23)
+        #expect(parsed.minute == 21)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 1383)
     }
 
-    func testHourZone24() throws {
+    @Test func hourZone24() throws {
         let s = "2023-12-31T12:21:25+24:00"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testZoneMinute0() throws {
+    @Test func zoneMinute0() throws {
         let s = "2023-12-31T09:00:25-13:00"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 0)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, -780)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 0)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == -780)
     }
 
-    func testZoneMinute1() throws {
+    @Test func zoneMinute1() throws {
         let s = "2023-12-31T09:01:24+02:01"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 1)
-        XCTAssertEqual(parsed.second, 24)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, 121)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 1)
+        #expect(parsed.second == 24)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == 121)
     }
 
-    func testZoneMinute59() throws {
+    @Test func zoneMinute59() throws {
         let s = "2023-12-31T09:01:25-15:59"
-        let parsed = try XCTUnwrap(parse(s))
+        let parsed = try #require(parse(s))
 
-        XCTAssertEqual(parsed.year, 2023)
-        XCTAssertEqual(parsed.month, 12)
-        XCTAssertEqual(parsed.day, 31)
-        XCTAssertEqual(parsed.hour, 9)
-        XCTAssertEqual(parsed.minute, 1)
-        XCTAssertEqual(parsed.second, 25)
-        XCTAssertEqual(parsed.secondFraction, 0)
-        XCTAssertEqual(parsed.secondFractionDigits, 0)
-        XCTAssertEqual(parsed.zone, -959)
+        #expect(parsed.year == 2023)
+        #expect(parsed.month == 12)
+        #expect(parsed.day == 31)
+        #expect(parsed.hour == 9)
+        #expect(parsed.minute == 1)
+        #expect(parsed.second == 25)
+        #expect(parsed.secondFraction == 0)
+        #expect(parsed.secondFractionDigits == 0)
+        #expect(parsed.zone == -959)
     }
 
-    func testZoneMinute60() throws {
+    @Test func zoneMinute60() throws {
         let s = "2023-12-31T09:12:25+08:60"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
     // MARK: Short fields
 
-    func testShortYear() throws {
+    @Test func shortYear() throws {
         let s = "202-12-31T09:01:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testShortMonth() throws {
+    @Test func shortMonth() throws {
         let s = "2023-1-31T09:01:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testShortDay() throws {
+    @Test func shortDay() throws {
         let s = "2023-01-3T09:01:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testShortHour() throws {
+    @Test func shortHour() throws {
         let s = "2023-01-03T9:01:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testShortMinute() throws {
+    @Test func shortMinute() throws {
         let s = "2023-01-03T09:1:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testShortSecond() throws {
+    @Test func shortSecond() throws {
         let s = "2023-01-03T09:01:0Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testMissingSecondFraction() throws {
+    @Test func missingSecondFraction() throws {
         let s = "2023-01-03T09:01:00.Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testShortZoneHour() throws {
+    @Test func shortZoneHour() throws {
         let s = "2023-01-03T09:01:01+0:00"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
     // MARK: Long fields
 
-    func testLongYear() throws {
+    @Test func longYear() throws {
         let s = "20200-12-31T09:01:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testLongMonth() throws {
+    @Test func longMonth() throws {
         let s = "2023-100-31T09:01:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testLongDay() throws {
+    @Test func longDay() throws {
         let s = "2023-01-301T09:01:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testLongHour() throws {
+    @Test func longHour() throws {
         let s = "2023-01-03T091:01:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testLongMinute() throws {
+    @Test func longMinute() throws {
         let s = "2023-01-03T09:011:00Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testLongSecond() throws {
+    @Test func longSecond() throws {
         let s = "2023-01-03T09:01:001Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testLongFraction() throws {
+    @Test func longFraction() throws {
         let s = "2023-01-03T09:01:00.12345678901Z"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
-    func testLongZoneHour() throws {
+    @Test func longZoneHour() throws {
         let s = "2023-01-03T09:01:01+001:00"
-        XCTAssertNil(parse(s))
+        #expect(parse(s) == nil)
     }
 
     // MARK: Date generator
 
-    func testDateGen() throws {
+    @Test func dateGen() throws {
         let isoFormatterUTC = ISO8601DateFormatter()
         let isoFormatterPlus = ISO8601DateFormatter()
         let isoFormatterMinus = ISO8601DateFormatter()
@@ -694,18 +695,18 @@ final class Parse3339Tests: XCTestCase {
         for timeInterval in stride(from: 0, to: 1_000_000_000, by: 100_000) {
             for formatter in formatters {
                 let str = formatter.string(from: Date(timeIntervalSince1970: TimeInterval(timeInterval)))
-                let parsed = try XCTUnwrap(parse(str))
+                let parsed = try #require(parse(str))
                 let unixDate = parsed.date
                 let dateComponents = parsed.dateComponents
-                let calendarDate = try XCTUnwrap(dateComponents.date)
-                XCTAssertEqual(calendarDate, unixDate)
+                let calendarDate = try #require(dateComponents.date)
+                #expect(calendarDate == unixDate)
             }
         }
     }
 
     // MARK: Decodable
 
-    func testDecodable() throws {
+    @Test func decodable() throws {
         struct Payload: Codable {
             let message: String
             let date: Date
@@ -739,9 +740,9 @@ final class Parse3339Tests: XCTestCase {
         decoder.dateDecodingStrategy = .custom(wrappedParse(_:))
         let decoded = try decoder.decode(Payload.self, from: json)
 
-        XCTAssertTrue(didCallParse.withLock { $0 })
-        XCTAssertEqual(decoded.message, "hello world")
-        XCTAssertEqual(decoded.date, date)
+        #expect(didCallParse.withLock { $0 })
+        #expect(decoded.message == "hello world")
+        #expect(decoded.date == date)
     }
 }
 

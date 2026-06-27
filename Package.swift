@@ -13,13 +13,17 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
         .package(url: "https://github.com/ordo-one/benchmark", .upToNextMajor(from: "1.35.0")),
     ],
     targets: [
         .target(name: "Parse3339"),
         .testTarget(
             name: "Parse3339Tests",
-            dependencies: ["Parse3339"],
+            dependencies: [
+                "Parse3339",
+                .product(name: "Numerics", package: "swift-numerics"),
+            ],
         ),
     ],
 )
