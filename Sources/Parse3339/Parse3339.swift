@@ -43,7 +43,7 @@ public struct Parts: Sendable {
     /// Subsecond fraction. `03.1234` as the second and fraction results in `1234` in this field. See ``secondFractionDigits`` for
     /// the number of digits after the period.
     public let secondFraction: Int
-    /// Number of subsecond fraction digits in the time stamp (0–10).
+    /// Number of subsecond fraction digits in the time stamp (0–9).
     public let secondFractionDigits: Int
     /// Time zone in minutes (-1439–1439).
     public let zone: Int
@@ -272,7 +272,7 @@ public func parse(_ span: Span<UInt8>) -> Parts? {
 
         case .secondFrac:
             if let num = parseDigit(element) {
-                if state.secondFractionDigits >= 10 {
+                if state.secondFractionDigits >= 9 {
                     return nil
                 }
                 state.secondFraction = addDigit(num, to: state.secondFraction)

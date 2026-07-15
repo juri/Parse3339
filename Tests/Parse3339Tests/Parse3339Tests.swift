@@ -184,6 +184,26 @@ import Testing
         #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
+    @Test(
+        arguments: [
+            ("1", 1, 100_000_000),
+            ("12", 2, 120_000_000),
+            ("123", 3, 123_000_000),
+            ("1234", 4, 123_400_000),
+            ("12345", 5, 123_450_000),
+            ("123456", 6, 123_456_000),
+            ("1234567", 7, 123_456_700),
+            ("12345678", 8, 123_456_780),
+            ("123456789", 9, 123_456_789),
+        ],
+    ) func `fraction to nanosecond`(_ frac: String, _ digits: Int, _ value: Int) throws {
+        let s = "2023-01-01T00:00:00.\(frac)Z"
+        let parsed = try #require(parse(s))
+        #expect(parsed.secondFractionDigits == digits)
+        let nanosecond = parsed.nanosecond
+        #expect(nanosecond == value)
+    }
+
     // MARK: Without fractions
 
     @Test func integralSecondsPlusZoneSuccessful() throws {
@@ -669,7 +689,7 @@ import Testing
     }
 
     @Test func longFraction() throws {
-        let s = "2023-01-03T09:01:00.12345678901Z"
+        let s = "2023-01-03T09:01:00.1234567890Z"
         #expect(parse(s) == nil)
     }
 
