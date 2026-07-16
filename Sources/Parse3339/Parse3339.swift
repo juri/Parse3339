@@ -22,7 +22,7 @@
 import Foundation
 
 private let calendar = Calendar(identifier: .gregorian)
-private let utc = TimeZone(secondsFromGMT: 0)
+private let utc = TimeZone(secondsFromGMT: 0)!
 
 // MARK: Parts
 
@@ -46,7 +46,11 @@ public struct Parts: Sendable {
     /// Number of subsecond fraction digits in the time stamp (0–9).
     public let secondFractionDigits: Int
     /// Time zone in minutes (-1439–1439).
-    public let zone: Int
+    ///
+    /// If `zone` is nil, the input zone value was -00:00, indicating that the time is in UTC but offset to local time was unknown.
+    ///
+    /// - SeeAlso: Section 4.3 of RFC 3339, Unknown Local Offset Convention.
+    public let zone: Int?
     /// The number of bytes consumed during parsing.
     public let consumedBytes: Int
 
@@ -57,8 +61,10 @@ public struct Parts: Sendable {
     }
 
     /// Time zone in seconds.
+    ///
+    /// This property treats a nil ``zone`` the same as zero. See the documentation of `zone` for the meaning of nil.
     public var zoneSeconds: Int {
-        self.zone * 60
+        (self.zone ?? 0) * 60
     }
 
     /// Parts as a `Date` value.
@@ -117,7 +123,7 @@ extension Parts {
             second: ps.second,
             secondFraction: ps.secondFraction,
             secondFractionDigits: ps.secondFractionDigits,
-            zone: ps.zoneDirection.multiplier * (ps.zoneHour * 60 + ps.zoneMinute),
+            zone: ps.zoneDirection == .minus && ps.zoneHour == 0 && ps.zoneMinute == 0 ? nil : ps.zoneDirection.multiplier * (ps.zoneHour * 60 + ps.zoneMinute),
             consumedBytes: consumedBytes,
         )
     }

@@ -8,6 +8,8 @@ From the `DateComponents` value you can go on to create a `Date` using a `Calend
 
 ``Parts/date`` used to be significantly faster path to `Date` than going via `DateComponents`. It uses the `timegm(3)` Unix function for calculating the `Date` value. At least on more recent macOS versions, it seems the `DateComponents` path has become the faster choice.
 
+``Parts/zone`` may be nil, to indicate that the value was in UTC but local zone offset was unknown when creating the time string. The methods that convert to Foundation types treat it the same as a zero offset.
+
 ## Topics
 
 ### Accessing parts of time stamp
