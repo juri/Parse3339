@@ -143,9 +143,13 @@ public func parse(_ substring: Substring) -> Parts? {
     }
 }
 
-/// Parse a `Span` of `UInt8` values into ``Parts``.
+/// Parse the start of `Span` of `UInt8` values into ``Parts``.
+///
+/// The span is allowed to contain trailing data. See ``Parts/consumedBytes`` for the number of bytes
+/// consumed during parsing.
 ///
 /// - SeeAlso: Parse a `String` with ``parse(_:)-(String)`` or a `Substring` with ``parse(_:)-(Substring)``.
+///            Both functions delegate the work to this one.
 public func parse(_ span: Span<UInt8>) -> Parts? {
     var state = ParseState()
     for index in span.indices {
