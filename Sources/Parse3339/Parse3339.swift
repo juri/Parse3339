@@ -401,7 +401,7 @@ public func parse(
 /// ```
 ///
 /// `parseFromDecoder` first decodes a `String` and then parses the string. For formats other than JSON you may get
-/// better performance by using an implementation that feeds bytes to ``parse(_:)-(Span<UInt8>)``;
+/// better performance by using an implementation that feeds bytes to ``parse(_:requireFullConsumption:)-(Span<UInt8>,_)``.
 public func parseFromDecoder(_ decoder: some Decoder) throws -> Date {
     let container = try decoder.singleValueContainer()
     let str = try container.decode(String.self)
