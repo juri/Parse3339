@@ -409,7 +409,7 @@ public func parseFromDecoder(_ decoder: some Decoder) throws -> Date {
         throw DecodingError.typeMismatch(
             Date.self,
             DecodingError.Context(
-                codingPath: [],
+                codingPath: decoder.codingPath,
                 debugDescription: "The string '\(str)' could not be parsed as a date",
             ),
         )
