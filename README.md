@@ -8,10 +8,10 @@ Parse3339 is a fast [RFC 3339] time stamp parser written in pure Swift.
 
 RFC 3339 specifies the commonly used subset of ISO 8601 suitable for time stamps. This parser restricts the subset even further. The following are the formats supported by Parse3339:
 
-- `2023-07-09T113:14:00+03:00`
-- `2023-07-09T113:14:00.2+03:00`
-- `2023-07-09T113:14:00Z`
-- `2023-07-09T113:14:00.2Z`
+- `2023-07-09T13:14:00+03:00`
+- `2023-07-09T13:14:00.2+03:00`
+- `2023-07-09T13:14:00Z`
+- `2023-07-09T13:14:00.2Z`
 
 There's nothing to configure, and it's all in just file in case you want to copy it over instead of using it as a package.
 
