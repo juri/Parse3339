@@ -219,7 +219,7 @@ public func parse(
         case .day:
             if state.count == 2 {
                 if element == Component.tee.rawValue {
-                    guard checkDay(state.day) else {
+                    guard checkDay(year: state.year, month: state.month, day: state.day) else {
                         return nil
                     }
                     state.field = .hour
@@ -470,8 +470,22 @@ private func checkMonth(_ month: Int) -> Bool {
     month > 0 && month < 13
 }
 
-private func checkDay(_ day: Int) -> Bool {
-    day > 0 && day < 32
+private func checkDay(year: Int, month: Int, day: Int) -> Bool {
+    guard day > 0 && day < 32 else { return false }
+
+    let isLeapYear = year.isMultiple(of: 400) || (year.isMultiple(of: 4) && !year.isMultiple(of: 100))
+
+    let daysInMonth: Int
+    switch month {
+    case 2:
+        daysInMonth = isLeapYear ? 29 : 28
+    case 4, 6, 9, 11:
+        daysInMonth = 30
+    default:
+        daysInMonth = 31
+    }
+
+    return day <= daysInMonth
 }
 
 private func checkHour(_ hour: Int) -> Bool {
