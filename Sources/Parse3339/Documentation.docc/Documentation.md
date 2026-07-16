@@ -12,10 +12,10 @@ Parse3339 is a fast pure Swift parser for a subset of [RFC 3339] formatted time 
 
 The time stamp formats supported by Parse3339 are the following:
 
-- `2023-07-09T113:14:00+03:00`
-- `2023-07-09T113:14:00.2+03:00`
-- `2023-07-09T113:14:00Z`
-- `2023-07-09T113:14:00.2Z`
+- `2023-07-09T13:14:00+03:00`
+- `2023-07-09T13:14:00.2+03:00`
+- `2023-07-09T13:14:00Z`
+- `2023-07-09T13:14:00.2Z`
 
 Note that the RFC specifies more allowed variations than this parser supports.
 
