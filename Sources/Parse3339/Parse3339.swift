@@ -84,10 +84,16 @@ public struct Parts: Sendable {
     }
 
     /// Parts as a `DateComponents` value.
-    public var dateComponents: DateComponents {
+    ///
+    /// This function constructs a `TimeZone`, whicih may not be able to represent the full range of time zones
+    /// allowed by the parsed format. If `TimeZone` initialization fails, this property returns nil.
+    public var dateComponents: DateComponents? {
+        guard let tz: TimeZone = self.zoneSeconds == 0 ? utc : TimeZone(secondsFromGMT: self.zoneSeconds) else {
+            return nil
+        }
         let d = DateComponents(
             calendar: calendar,
-            timeZone: self.zoneSeconds == 0 ? utc : TimeZone(secondsFromGMT: self.zoneSeconds),
+            timeZone: tz,
             year: self.year,
             month: self.month,
             day: self.day,

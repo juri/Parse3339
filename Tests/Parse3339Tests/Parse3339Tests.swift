@@ -105,7 +105,7 @@ import Testing
         #expect(parsed.nanosecond == 200_000_000)
 
         let unixTime = 1_688_458_885.2
-        #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
+        #expect(parsed.dateComponents!.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
     @Test func fullZZoneWithMillisecondsSuccessful() throws {
@@ -124,7 +124,7 @@ import Testing
         #expect(parsed.nanosecond == 295_000_000)
 
         let unixTime = 1_688_458_885.295
-        #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
+        #expect(parsed.dateComponents!.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
     @Test func fullZZoneWithMicrosecondsSuccessful() throws {
@@ -143,7 +143,7 @@ import Testing
         #expect(parsed.nanosecond == 295_729_000)
 
         let unixTime = 1_688_458_885.295729
-        #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
+        #expect(parsed.dateComponents!.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
     @Test func fullZZoneToDateWithNanosecondsSuccessful() throws {
@@ -181,7 +181,7 @@ import Testing
         #expect(parsed.nanosecond == 295_729_572)
 
         let unixTime = 1_688_458_885.295729572
-        #expect(parsed.dateComponents.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
+        #expect(parsed.dateComponents!.date!.timeIntervalSince1970.isApproximatelyEqual(to: unixTime))
     }
 
     @Test(
@@ -718,7 +718,7 @@ import Testing
                 let parsed = try #require(parse(str))
                 let unixDate = parsed.date
                 let dateComponents = parsed.dateComponents
-                let calendarDate = try #require(dateComponents.date)
+                let calendarDate = try #require(dateComponents?.date)
                 #expect(calendarDate == unixDate)
             }
         }

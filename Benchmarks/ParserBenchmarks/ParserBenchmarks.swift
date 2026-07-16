@@ -20,7 +20,7 @@ let benchmarks: @Sendable () -> Void = {
         for _ in benchmark.scaledIterations {
             let parsed = parse(s)!
             let dateComponents = parsed.dateComponents
-            let parsedDate = dateComponents.date!
+            let parsedDate = dateComponents!.date!
             blackHole(parsedDate)
         }
     }

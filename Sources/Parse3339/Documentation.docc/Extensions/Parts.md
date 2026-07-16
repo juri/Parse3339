@@ -2,7 +2,7 @@
 
 ## Converting to Foundation types
 
-`Parts` provides two computed properties for creating Foundation types, ``Parts/date`` for creating a `Date` and ``Parts/dateComponents`` for creating a `DateComponents`. 
+`Parts` provides two computed properties for creating Foundation types, ``Parts/date`` for creating a `Date` and ``Parts/dateComponents`` for creating a `DateComponents`. `dateComponents` may fail if the source string had a time zone value outside the supported range of Foundation's `TimeZone`.
 
 From the `DateComponents` value you can go on to create a `Date` using a `Calendar`; RFC 3339 time stamps are defined to be in the Gregorian calendar and they always have a time zone, so the `DateComponents` `Parts` creates have those filled and the `DateComponents` value's `date` property works as expected.
 
