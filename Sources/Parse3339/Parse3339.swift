@@ -121,36 +121,63 @@ extension Parts {
 
 /// Parse a `String` into ``Parts``.
 ///
+/// The string is allowed to contain trailing data, unless you specify `requireFullConsumption`. See
+/// ``Parts/consumedBytes`` for the number of bytes consumed during parsing.
+///
+/// - Parameters:
+///     - string: The string to parse.
+///     - requireFullConsumption: If true and if the number of consumed bytes doesn't match the length of `string`, return nil.
+///
 /// - SeeAlso: Parse a `Substring` with ``parse(_:)-(Substring)`` or a `Span<UInt8>` with ``parse(_:)-(Span<UInt8>)``.
 @inlinable
-public func parse(_ string: String) -> Parts? {
+public func parse(
+    _ string: String,
+    requireFullConsumption: Bool = false,
+) -> Parts? {
     var string = string
     return string.withUTF8 { buffer in
         let span = buffer.span
-        return parse(span)
+        return parse(span, requireFullConsumption: requireFullConsumption)
     }
 }
 
 /// Parse a `Substring` into ``Parts``.
 ///
+/// The substring is allowed to contain trailing data, unless you specify `requireFullConsumption`. See
+/// ``Parts/consumedBytes`` for the number of bytes consumed during parsing.
+///
+/// - Parameters:
+///     - substring: The substring to parse.
+///     - requireFullConsumption: If true and if the number of consumed bytes doesn't match the length of `substring`, return nil.
+///
 /// - SeeAlso: Parse a `String` with ``parse(_:)-(String)`` or a `Span<UInt8>` with ``parse(_:)-(Span<UInt8>)``.
 @inlinable
-public func parse(_ substring: Substring) -> Parts? {
+public func parse(
+    _ substring: Substring,
+    requireFullConsumption: Bool = false,
+) -> Parts? {
     var substring = substring
     return substring.withUTF8 { buffer in
         let span = buffer.span
-        return parse(span)
+        return parse(span, requireFullConsumption: requireFullConsumption)
     }
 }
 
 /// Parse the start of `Span` of `UInt8` values into ``Parts``.
 ///
-/// The span is allowed to contain trailing data. See ``Parts/consumedBytes`` for the number of bytes
-/// consumed during parsing.
+/// The span is allowed to contain trailing data, unless you specify `requireFullConsumption`. See
+/// ``Parts/consumedBytes`` for the number of bytes consumed during parsing.
+///
+/// - Parameters:
+///     - span: The span to parse.
+///     - requireFullConsumption: If true and if the number of consumed bytes doesn't match the length of `span`, return nil.
 ///
 /// - SeeAlso: Parse a `String` with ``parse(_:)-(String)`` or a `Substring` with ``parse(_:)-(Substring)``.
 ///            Both functions delegate the work to this one.
-public func parse(_ span: Span<UInt8>) -> Parts? {
+public func parse(
+    _ span: Span<UInt8>,
+    requireFullConsumption: Bool = false,
+) -> Parts? {
     var state = ParseState()
     for index in span.indices {
         let element = span[index]
@@ -257,7 +284,11 @@ public func parse(_ span: Span<UInt8>) -> Parts? {
                     state.zoneDirection = .minus
                     state.count = 0
                 } else if element == Component.zed.rawValue {
-                    return Parts(state, consumedBytes: index + 1)
+                    let consumedBytes = index + 1
+                    guard !requireFullConsumption || consumedBytes == span.count else {
+                        return nil
+                    }
+                    return Parts(state, consumedBytes: consumedBytes)
                 } else {
                     return nil
                 }
@@ -286,7 +317,11 @@ public func parse(_ span: Span<UInt8>) -> Parts? {
                 state.field = .zoneHour
                 state.zoneDirection = .minus
             } else if element == Component.zed.rawValue {
-                return Parts(state, consumedBytes: index + 1)
+                let consumedBytes = index + 1
+                guard !requireFullConsumption || consumedBytes == span.count else {
+                    return nil
+                }
+                return Parts(state, consumedBytes: consumedBytes)
             } else {
                 return nil
             }
@@ -311,6 +346,9 @@ public func parse(_ span: Span<UInt8>) -> Parts? {
 
         case .zoneMinute:
             if state.count == 2 {
+                guard !requireFullConsumption else {
+                    return nil
+                }
                 return Parts(state, consumedBytes: index)
             } else if let num = parseDigit(element) {
                 state.zoneMinute = addDigit(num, to: state.zoneMinute)

@@ -23,12 +23,18 @@ There's nothing to configure, and it's all in just file in case you want to copy
 import Parse3339
 
 let s = "2023-07-09T13:14:00+03:00"
-guard let parts = Parse3339.parse(s) else {
+guard let parts = Parse3339::parse(s) else {
     return
 }
 let date = parts.date
 print(date.timeIntervalSinceReferenceDate)
 // output: 710590440.0
+```
+
+There are variants of `parse` for `String`, `Substring` and `Span<UInt8>`. By default `parse` parses the start of the string and allows trailing data. If you don't want to allow trailing data, you can specify `requireFullConsumption`:
+
+```swift
+Parse3339::parse(s, requireFullConsumption: true)
 ```
 
 There's a helper function you can use with Foundation's `JSONDecoder`:
@@ -37,7 +43,7 @@ There's a helper function you can use with Foundation's `JSONDecoder`:
 import Parse3339
 
 let decoder = JSONDecoder()
-decoder.dateDecodingStrategy = .custom(Parse3339.parseFromDecoder(_:))
+decoder.dateDecodingStrategy = .custom(Parse3339::parseFromDecoder(_:))
 ```
 
 For `Package.swift` snippets and documentation, visit the [Swift Package Index page](https://swiftpackageindex.com/juri/Parse3339).
