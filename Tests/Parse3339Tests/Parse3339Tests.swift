@@ -460,14 +460,14 @@ import Testing
     }
 
     @Test func minute59() throws {
-        let s = "2023-12-31T09:01:25Z"
+        let s = "2023-12-31T09:59:25Z"
         let parsed = try #require(parse(s))
 
         #expect(parsed.year == 2023)
         #expect(parsed.month == 12)
         #expect(parsed.day == 31)
         #expect(parsed.hour == 9)
-        #expect(parsed.minute == 1)
+        #expect(parsed.minute == 59)
         #expect(parsed.second == 25)
         #expect(parsed.secondFraction == 0)
         #expect(parsed.secondFractionDigits == 0)
