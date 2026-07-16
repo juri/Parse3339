@@ -143,12 +143,6 @@ public func parse(_ substring: Substring) -> Parts? {
     }
 }
 
-private enum ByteResult {
-    case complete
-    case incomplete
-    case failure
-}
-
 /// Parse a `Span` of `UInt8` values into ``Parts``.
 ///
 /// - SeeAlso: Parse a `String` with ``parse(_:)-(String)`` or a `Substring` with ``parse(_:)-(Substring)``.
