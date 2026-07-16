@@ -37,8 +37,9 @@ print(date.timeIntervalSinceReferenceDate)
 
 ### Parsing
 
-- ``parse(_:)-89jso``
-- ``parse(_:)-9on3x``
+- ``parse(_:requireFullConsumption:)-(Span<UInt8>,_)``
+- ``parse(_:requireFullConsumption:)-(String,_)``
+- ``parse(_:requireFullConsumption:)-(Substring,_)``
 
 ### Parser output
 
