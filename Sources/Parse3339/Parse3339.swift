@@ -47,6 +47,8 @@ public struct Parts: Sendable {
     public let secondFractionDigits: Int
     /// Time zone in minutes (-1439–1439).
     public let zone: Int
+    /// The number of bytes consumed during parsing.
+    public let consumedBytes: Int
 
     /// The fractional second value in nanoseconds.
     public var nanosecond: Int {
@@ -99,7 +101,7 @@ public struct Parts: Sendable {
 }
 
 extension Parts {
-    fileprivate init(_ ps: ParseState) {
+    fileprivate init(_ ps: ParseState, consumedBytes: Int) {
         self.init(
             year: ps.year,
             month: ps.month,
@@ -110,6 +112,7 @@ extension Parts {
             secondFraction: ps.secondFraction,
             secondFractionDigits: ps.secondFractionDigits,
             zone: ps.zoneDirection.multiplier * (ps.zoneHour * 60 + ps.zoneMinute),
+            consumedBytes: consumedBytes,
         )
     }
 }
@@ -256,7 +259,7 @@ public func parse(_ span: Span<UInt8>) -> Parts? {
                     state.zoneDirection = .minus
                     state.count = 0
                 } else if element == Component.zed.rawValue {
-                    return Parts(state)
+                    return Parts(state, consumedBytes: index + 1)
                 } else {
                     return nil
                 }
@@ -285,7 +288,7 @@ public func parse(_ span: Span<UInt8>) -> Parts? {
                 state.field = .zoneHour
                 state.zoneDirection = .minus
             } else if element == Component.zed.rawValue {
-                return Parts(state)
+                return Parts(state, consumedBytes: index + 1)
             } else {
                 return nil
             }
@@ -310,7 +313,7 @@ public func parse(_ span: Span<UInt8>) -> Parts? {
 
         case .zoneMinute:
             if state.count == 2 {
-                return Parts(state)
+                return Parts(state, consumedBytes: index)
             } else if let num = parseDigit(element) {
                 state.zoneMinute = addDigit(num, to: state.zoneMinute)
                 guard checkMinute(state.zoneMinute) else {
@@ -324,7 +327,7 @@ public func parse(_ span: Span<UInt8>) -> Parts? {
     }
 
     if case .zoneMinute = state.field, state.count == 2 {
-        return Parts(state)
+        return Parts(state, consumedBytes: span.count)
     }
     return nil
 }
