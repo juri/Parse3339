@@ -764,6 +764,16 @@ import Testing
         #expect(decoded.message == "hello world")
         #expect(decoded.date == date)
     }
+
+    @Test func `leap second is accepted and rolls over`() throws {
+        let s = "2026-07-16T15:28:60.000Z"
+        let p = try #require(parse(s))
+        let dc = try #require(p.dateComponents)
+        let dcd = try #require(dc.date)
+        let pd = p.date
+        #expect(dcd == pd)
+        #expect(dcd.timeIntervalSinceReferenceDate == 805_908_540.0)
+    }
 }
 
 var isoFormatter: ISO8601DateFormatter {

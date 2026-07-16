@@ -174,6 +174,10 @@ public func parse(
 /// The span is allowed to contain trailing data, unless you specify `requireFullConsumption`. See
 /// ``Parts/consumedBytes`` for the number of bytes consumed during parsing.
 ///
+/// `parse` doesn't perform leap second validation: it always accepts 60 as the seconds value, regardless
+/// if date. If the leap second is invalid there, it automatically rolls over to zero seconds on the next minute
+/// when converting the `Parts` value to a Date.
+///
 /// - Parameters:
 ///     - span: The span to parse.
 ///     - requireFullConsumption: If true and if the number of consumed bytes doesn't match the length of `span`, return nil.
