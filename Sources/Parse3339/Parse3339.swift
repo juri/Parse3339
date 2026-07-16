@@ -140,7 +140,7 @@ extension Parts {
 ///     - string: The string to parse.
 ///     - requireFullConsumption: If true and if the number of consumed bytes doesn't match the length of `string`, return nil.
 ///
-/// - SeeAlso: Parse a `Substring` with ``parse(_:)-(Substring)`` or a `Span<UInt8>` with ``parse(_:)-(Span<UInt8>)``.
+/// - SeeAlso: Parse a `Substring` with ``parse(_:requireFullConsumption:)-(Substring,_)`` or a `Span<UInt8>` with ``parse(_:requireFullConsumption:)-(Span<UInt8>,_)``
 @inlinable
 public func parse(
     _ string: String,
@@ -162,7 +162,7 @@ public func parse(
 ///     - substring: The substring to parse.
 ///     - requireFullConsumption: If true and if the number of consumed bytes doesn't match the length of `substring`, return nil.
 ///
-/// - SeeAlso: Parse a `String` with ``parse(_:)-(String)`` or a `Span<UInt8>` with ``parse(_:)-(Span<UInt8>)``.
+/// - SeeAlso: Parse a `String` with ``parse(_:requireFullConsumption:)-(String,_)`` or a `Span<UInt8>` with ``parse(_:requireFullConsumption:)-(Span<UInt8>,_)``
 @inlinable
 public func parse(
     _ substring: Substring,
@@ -188,7 +188,7 @@ public func parse(
 ///     - span: The span to parse.
 ///     - requireFullConsumption: If true and if the number of consumed bytes doesn't match the length of `span`, return nil.
 ///
-/// - SeeAlso: Parse a `String` with ``parse(_:)-(String)`` or a `Substring` with ``parse(_:)-(Substring)``.
+/// - SeeAlso: Parse a `String` with ``parse(_:requireFullConsumption:)-(String,_)`` or a `Substring` with ``parse(_:requireFullConsumption:)-(Substring,_)``.
 ///            Both functions delegate the work to this one.
 public func parse(
     _ span: Span<UInt8>,
