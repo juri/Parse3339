@@ -60,6 +60,8 @@ It has benchmarks that parse the same string using Foundation's `DateFormatter`,
 
 Output from one run:
 
+### Parse with DateFormatter
+
 | Metric                         |        p0 |       p25 |       p50 |       p75 |       p90 |       p99 |      p100 |   Samples |
 |:-------------------------------|----------:|----------:|----------:|----------:|----------:|----------:|----------:|----------:|
 | Free (total) *                 |       502 |       502 |       502 |       502 |       502 |       502 |       504 |    100000 |
