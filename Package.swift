@@ -13,6 +13,10 @@ let package = Package(
             targets: ["Parse3339"],
         ),
     ],
+    traits: [
+        .trait(name: "WithFoundation"),
+        .default(enabledTraits: ["WithFoundation"]),
+    ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
         .package(url: "https://github.com/ordo-one/benchmark", .upToNextMajor(from: "1.35.0")),

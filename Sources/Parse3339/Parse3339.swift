@@ -19,10 +19,12 @@
  date-time       = full-date "T" full-time
  */
 
+#if WithFoundation
 import Foundation
 
 private let calendar = Calendar(identifier: .gregorian)
 private let utc = TimeZone(secondsFromGMT: 0)!
+#endif
 
 // MARK: Parts
 
@@ -66,7 +68,11 @@ public struct Parts: Sendable {
     public var zoneSeconds: Int {
         (self.zone ?? 0) * 60
     }
+}
 
+#if WithFoundation
+
+extension Parts {
     /// Parts as a `Date` value.
     public var date: Date {
         var t = tm(
@@ -111,6 +117,8 @@ public struct Parts: Sendable {
         return d
     }
 }
+
+#endif
 
 extension Parts {
     fileprivate init(_ ps: ParseState, consumedBytes: Int) {
@@ -386,6 +394,8 @@ public func parse(
 
 // MARK: JSONDecoder support
 
+#if WithFoundation
+
 /// Helper function for using Parse3339 with Codable types.
 ///
 /// Use `parseFromDecoder(_:)` with a custom date decoding strategy. The mechanism depends on
@@ -416,6 +426,8 @@ public func parseFromDecoder(_ decoder: some Decoder) throws -> Date {
     }
     return parsed.date
 }
+
+#endif
 
 // MARK: - Private
 

@@ -46,6 +46,8 @@ let decoder = JSONDecoder()
 decoder.dateDecodingStrategy = .custom(Parse3339::parseFromDecoder(_:))
 ```
 
+Parse3339 ships with Foundation integration (`Date`, `DateComponents`) enabled by default, but they can be disabled by disabling the `WithFoundation` trait. The parsing itself uses only Swift standard library types.
+
 For `Package.swift` snippets and documentation, visit the [Swift Package Index page](https://swiftpackageindex.com/juri/Parse3339).
 
 ## Speed and memory usage
