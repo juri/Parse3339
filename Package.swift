@@ -30,11 +30,6 @@ let package = Package(
                 .product(name: "Numerics", package: "swift-numerics"),
             ],
         ),
-    ],
-)
-
-if ProcessInfo.processInfo.environment["PARSE3339_BENCHMARK"] != nil {
-    package.targets += [
         .executableTarget(
             name: "ParserBenchmarks",
             dependencies: [
@@ -46,5 +41,5 @@ if ProcessInfo.processInfo.environment["PARSE3339_BENCHMARK"] != nil {
                 .plugin(name: "BenchmarkPlugin", package: "benchmark"),
             ],
         ),
-    ]
-}
+    ],
+)

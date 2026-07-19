@@ -55,7 +55,7 @@ For `Package.swift` snippets and documentation, visit the [Swift Package Index p
 Parse3339 is pleasantly fast and stingy with memory usage. The package has benchmarks:
 
 ```sh
-env PARSE3339_BENCHMARK=1 swift package benchmark --target ParserBenchmarks
+swift package benchmark
 ```
 
 It has benchmarks that parse the same string using Foundation's `DateFormatter`, Foundation's `ISO8601DateFormatter`, Parse3339 creating a `Date` with Foundation's `DateComponents` and `Calendar`, and Parse3339 creating a `Date` with standard Unix functions.
