@@ -55,6 +55,7 @@ let benchmarks: @Sendable () -> Void = {
         }
     }
 
+    #if WithFoundation
     Benchmark("Parse with Parse3339 (DateComponents)", configuration: config) { benchmark in
         let s = "2023-07-04T08:21:25+03:00"
         for _ in benchmark.scaledIterations {
@@ -73,6 +74,8 @@ let benchmarks: @Sendable () -> Void = {
             blackHole(parsedDate)
         }
     }
+
+    #endif
 
     Benchmark("Parse with ISO8601DateFormatter", configuration: config) { benchmark in
         let fmt = ISO8601DateFormatter()
