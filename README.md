@@ -66,7 +66,7 @@ swift package benchmark --filter 'Parse with Parse3339 \((String|Span) only\)' -
 
 These benchmarks use 8,192 timestamps with varying dates, fractional precision, and time zones. They measure the `String` and byte-span entry points separately.
 
-It has benchmarks that parse the same string using Foundation's `DateFormatter`, Foundation's `ISO8601DateFormatter`, Parse3339 creating a `Date` with Foundation's `DateComponents` and `Calendar`, and Parse3339 creating a `Date` with standard Unix functions.
+There are also benchmarks that parse the same string using Foundation's `DateFormatter`, Foundation's `ISO8601DateFormatter`, Parse3339 creating a `Date` with Foundation's `DateComponents` and `Calendar`, and Parse3339 creating a `Date` with standard Unix functions.
 
 Output from one run:
 
