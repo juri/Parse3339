@@ -120,23 +120,6 @@ extension Parts {
 
 #endif
 
-extension Parts {
-    fileprivate init(_ ps: ParseState, consumedBytes: Int) {
-        self.init(
-            year: ps.year,
-            month: ps.month,
-            day: ps.day,
-            hour: ps.hour,
-            minute: ps.minute,
-            second: ps.second,
-            secondFraction: ps.secondFraction,
-            secondFractionDigits: ps.secondFractionDigits,
-            zone: ps.zoneDirection == .minus && ps.zoneHour == 0 && ps.zoneMinute == 0 ? nil : ps.zoneDirection.multiplier * (ps.zoneHour * 60 + ps.zoneMinute),
-            consumedBytes: consumedBytes,
-        )
-    }
-}
-
 // MARK: Parse functions
 
 /// Parse a `String` into ``Parts``.
@@ -202,194 +185,76 @@ public func parse(
     _ span: Span<UInt8>,
     requireFullConsumption: Bool = false,
 ) -> Parts? {
-    var state = ParseState()
-    for index in span.indices {
-        let element = span[index]
+    // The shortest supported time stamp is "0000-01-01T00:00:00Z".
+    // Check the length once before reading the fixed-position date and time fields.
+    guard span.count >= 20,
+          span[4] == Component.dash.rawValue,
+          span[7] == Component.dash.rawValue,
+          span[10] == Component.tee.rawValue,
+          span[13] == Component.colon.rawValue,
+          span[16] == Component.colon.rawValue,
+          let century = parseTwoDigits(span[0], span[1]),
+          let yearInCentury = parseTwoDigits(span[2], span[3]),
+          let month = parseTwoDigits(span[5], span[6]),
+          let day = parseTwoDigits(span[8], span[9]),
+          let hour = parseTwoDigits(span[11], span[12]),
+          let minute = parseTwoDigits(span[14], span[15]),
+          let second = parseTwoDigits(span[17], span[18]),
+          checkMonth(month), checkHour(hour), checkMinute(minute), checkSecond(second)
+    else {
+        return nil
+    }
 
-        switch state.field {
-        case .year:
-            if state.count == 4 {
-                if element == Component.dash.rawValue {
-                    state.field = .month
-                    state.count = 0
-                } else {
-                    return nil
-                }
-            } else if let num = parseDigit(element) {
-                state.year = addDigit(num, to: state.year)
-                state.count += 1
-            } else {
-                return nil
-            }
+    let year = century * 100 + yearInCentury
+    guard checkDay(year: year, month: month, day: day) else { return nil }
 
-        case .month:
-            if state.count == 2 {
-                if element == Component.dash.rawValue {
-                    guard checkMonth(state.month) else {
-                        return nil
-                    }
-                    state.field = .day
-                    state.count = 0
-                } else {
-                    return nil
-                }
-            } else if let num = parseDigit(element) {
-                state.month = addDigit(num, to: state.month)
-                state.count += 1
-            } else {
-                return nil
-            }
-
-        case .day:
-            if state.count == 2 {
-                if element == Component.tee.rawValue {
-                    guard checkDay(year: state.year, month: state.month, day: state.day) else {
-                        return nil
-                    }
-                    state.field = .hour
-                    state.count = 0
-                } else {
-                    return nil
-                }
-            } else if let num = parseDigit(element) {
-                state.day = addDigit(num, to: state.day)
-                state.count += 1
-            } else {
-                return nil
-            }
-
-        case .hour:
-            if state.count == 2 {
-                if element == Component.colon.rawValue {
-                    state.field = .minute
-                    state.count = 0
-                } else {
-                    return nil
-                }
-            } else if let num = parseDigit(element) {
-                state.hour = addDigit(num, to: state.hour)
-                guard checkHour(state.hour) else {
-                    return nil
-                }
-                state.count += 1
-            } else {
-                return nil
-            }
-
-        case .minute:
-            if state.count == 2 {
-                if element == Component.colon.rawValue {
-                    state.field = .second
-                    state.count = 0
-                } else {
-                    return nil
-                }
-            } else if let num = parseDigit(element) {
-                state.minute = addDigit(num, to: state.minute)
-                guard checkMinute(state.minute) else {
-                    return nil
-                }
-                state.count += 1
-            } else {
-                return nil
-            }
-
-        case .second:
-            if state.count == 2 {
-                if element == Component.period.rawValue {
-                    state.field = .secondFrac
-                    state.count = 0
-                } else if element == Component.plus.rawValue {
-                    state.field = .zoneHour
-                    state.zoneDirection = .plus
-                    state.count = 0
-                } else if element == Component.dash.rawValue {
-                    state.field = .zoneHour
-                    state.zoneDirection = .minus
-                    state.count = 0
-                } else if element == Component.zed.rawValue {
-                    let consumedBytes = index + 1
-                    guard !requireFullConsumption || consumedBytes == span.count else {
-                        return nil
-                    }
-                    return Parts(state, consumedBytes: consumedBytes)
-                } else {
-                    return nil
-                }
-            } else if let num = parseDigit(element) {
-                state.second = addDigit(num, to: state.second)
-                guard checkSecond(state.second) else {
-                    return nil
-                }
-                state.count += 1
-            } else {
-                return nil
-            }
-
-        case .secondFrac:
-            if let num = parseDigit(element) {
-                if state.secondFractionDigits >= 9 {
-                    return nil
-                }
-                state.secondFraction = addDigit(num, to: state.secondFraction)
-                state.secondFractionDigits += 1
-            } else if state.secondFractionDigits == 0 {
-                return nil
-            } else if element == Component.plus.rawValue {
-                state.field = .zoneHour
-            } else if element == Component.dash.rawValue {
-                state.field = .zoneHour
-                state.zoneDirection = .minus
-            } else if element == Component.zed.rawValue {
-                let consumedBytes = index + 1
-                guard !requireFullConsumption || consumedBytes == span.count else {
-                    return nil
-                }
-                return Parts(state, consumedBytes: consumedBytes)
-            } else {
-                return nil
-            }
-
-        case .zoneHour:
-            if state.count == 2 {
-                if element == Component.colon.rawValue {
-                    state.field = .zoneMinute
-                    state.count = 0
-                } else {
-                    return nil
-                }
-            } else if let num = parseDigit(element) {
-                state.zoneHour = addDigit(num, to: state.zoneHour)
-                guard checkHour(state.zoneHour) else {
-                    return nil
-                }
-                state.count += 1
-            } else {
-                return nil
-            }
-
-        case .zoneMinute:
-            if state.count == 2 {
-                guard !requireFullConsumption else {
-                    return nil
-                }
-                return Parts(state, consumedBytes: index)
-            } else if let num = parseDigit(element) {
-                state.zoneMinute = addDigit(num, to: state.zoneMinute)
-                guard checkMinute(state.zoneMinute) else {
-                    return nil
-                }
-                state.count += 1
-            } else {
-                return nil
-            }
+    var index = 19
+    var fraction = 0
+    var fractionDigits = 0
+    if span[index] == Component.period.rawValue {
+        index += 1
+        while index < span.count, let digit = parseDigit(span[index]) {
+            guard fractionDigits < 9 else { return nil }
+            fraction = fraction * 10 + digit
+            fractionDigits += 1
+            index += 1
         }
+        guard fractionDigits > 0, index < span.count else { return nil }
     }
 
-    if case .zoneMinute = state.field, state.count == 2 {
-        return Parts(state, consumedBytes: span.count)
+    let zone: Int?
+    let direction = span[index]
+    if direction == Component.zed.rawValue {
+        zone = 0
+        index += 1
+    } else {
+        guard direction == Component.plus.rawValue || direction == Component.dash.rawValue,
+              span.count - index >= 6,
+              span[index + 3] == Component.colon.rawValue,
+              let zoneHour = parseTwoDigits(span[index + 1], span[index + 2]),
+              let zoneMinute = parseTwoDigits(span[index + 4], span[index + 5]),
+              checkHour(zoneHour), checkMinute(zoneMinute)
+        else {
+            return nil
+        }
+        let offset = zoneHour * 60 + zoneMinute
+        zone = direction == Component.dash.rawValue ? (offset == 0 ? nil : -offset) : offset
+        index += 6
     }
-    return nil
+
+    guard !requireFullConsumption || index == span.count else { return nil }
+    return Parts(
+        year: year,
+        month: month,
+        day: day,
+        hour: hour,
+        minute: minute,
+        second: second,
+        secondFraction: fraction,
+        secondFractionDigits: fractionDigits,
+        zone: zone,
+        consumedBytes: index,
+    )
 }
 
 // MARK: JSONDecoder support
@@ -431,32 +296,11 @@ public func parseFromDecoder(_ decoder: some Decoder) throws -> Date {
 
 // MARK: - Private
 
-private enum ZoneDirection {
-    case plus
-    case minus
-
-    var multiplier: Int {
-        switch self {
-        case .plus: return 1
-        case .minus: return -1
-        }
-    }
-}
-
-private enum Field {
-    case year
-    case month
-    case day
-    case hour
-    case minute
-    case second
-    case secondFrac
-    case zoneHour
-    case zoneMinute
-}
-
-private func addDigit(_ num: Int, to target: Int) -> Int {
-    target * 10 + num
+private func parseTwoDigits(_ first: UInt8, _ second: UInt8) -> Int? {
+    let tens = first &- Component.n0.rawValue
+    let ones = second &- Component.n0.rawValue
+    guard tens < 10, ones < 10 else { return nil }
+    return Int(tens) * 10 + Int(ones)
 }
 
 private enum Component: UInt8 {
@@ -469,29 +313,9 @@ private enum Component: UInt8 {
     case zed = 0x5A
 }
 
-private struct ParseState {
-    var field = Field.year
-    var year = 0
-    var month = 0
-    var day = 0
-    var hour = 0
-    var minute = 0
-    var second = 0
-    var secondFraction = 0
-    var secondFractionDigits = 0
-    var zoneDirection = ZoneDirection.plus
-    var zoneHour = 0
-    var zoneMinute = 0
-    var count = 0
-}
-
 func parseDigit(_ source: UInt8) -> Int? {
     let value = source &- Component.n0.rawValue
     return value < 10 ? Int(value) : nil
-}
-
-private func checkYear(_ year: Int) -> Bool {
-    year >= 0 && year < 10000
 }
 
 private func checkMonth(_ month: Int) -> Bool {
