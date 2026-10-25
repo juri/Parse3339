@@ -287,13 +287,13 @@ public func parse(
 /// the `TopLevelDecoder` implementation. With `JSONDecoder` you can use the `dateDecodingStrategy`
 /// property with a `custom` value like this:
 ///
-/// `parseFromDecoder(_:)` does not require full consumption of the string, matching Foundation's
-/// `iso8601` parser which also allows trailing data after the time stamp.
-///
 /// ```swift
 /// let decoder = JSONDecoder()
 /// decoder.dateDecodingStrategy = .custom(Parse3339.parseFromDecoder(_:))
 /// ```
+///
+/// `parseFromDecoder(_:)` does not require full consumption of the string, matching Foundation's
+/// `iso8601` parser which also allows trailing data after the time stamp.
 ///
 /// `parseFromDecoder` first decodes a `String` and then parses the string. For formats other than JSON you may get
 /// better performance by using an implementation that feeds bytes to ``parse(_:requireFullConsumption:)-(Span<UInt8>,_)``.
