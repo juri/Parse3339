@@ -39,6 +39,43 @@ import Testing
         }
     }
 
+    // Exhaustive byte pairs exercise carries between SWAR lanes, including
+    // cases where both bytes are invalid. The other fields stay valid.
+    @Test(arguments: [
+        (0, 0 ... 99), (2, 0 ... 99), (5, 1 ... 12), (8, 1 ... 31),
+        (11, 0 ... 23), (14, 0 ... 59), (17, 0 ... 60),
+        (20, 0 ... 23), (23, 0 ... 59),
+    ])
+    func bytePairs(_ index: Int, _ validValues: ClosedRange<Int>) {
+        var bytes = Array("2000-01-01T00:00:00+00:00".utf8)
+        for first in UInt8.min ... UInt8.max {
+            for second in UInt8.min ... UInt8.max {
+                bytes[index] = first
+                bytes[index + 1] = second
+                let digits = first >= 0x30 && first <= 0x39 && second >= 0x30 && second <= 0x39
+                let value = (Int(first) - 0x30) * 10 + Int(second) - 0x30
+                let expected = digits && validValues.contains(value)
+                let parsed = bytes.withUnsafeBufferPointer { parse($0.span, requireFullConsumption: true) }
+                #expect((parsed != nil) == expected)
+            }
+        }
+    }
+
+    @Test(arguments: [
+        "0000-01-01T00:00:00Z",
+        "9999-12-31T23:59:60+23:59",
+        "2024-02-29T12:34:56.123456789-00:00",
+    ])
+    func unalignedInput(_ timestamp: String) throws {
+        for offset in 0 ..< 8 {
+            let bytes = Array(repeating: UInt8(0xFF), count: offset) + Array(timestamp.utf8)
+            let parts = try #require(bytes.withUnsafeBufferPointer { buffer in
+                parse(buffer.span.extracting(offset...), requireFullConsumption: true)
+            })
+            #expect(parts.consumedBytes == timestamp.utf8.count)
+        }
+    }
+
     @Test func slicedInputsAndUnicodeTrailingData() throws {
         let timestamp = "2024-02-29T23:59:60.123456789-00:00"
         let surrounded = "prefix\(timestamp)🌍"

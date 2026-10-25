@@ -186,26 +186,40 @@ public func parse(
     requireFullConsumption: Bool = false,
 ) -> Parts? {
     // The shortest supported time stamp is "0000-01-01T00:00:00Z".
-    // Check the length once before reading the fixed-position date and time fields.
-    guard span.count >= 20,
-          span[4] == Component.dash.rawValue,
-          span[7] == Component.dash.rawValue,
-          span[10] == Component.tee.rawValue,
-          span[13] == Component.colon.rawValue,
-          span[16] == Component.colon.rawValue,
-          let century = parseTwoDigits(span[0], span[1]),
-          let yearInCentury = parseTwoDigits(span[2], span[3]),
-          let month = parseTwoDigits(span[5], span[6]),
-          let day = parseTwoDigits(span[8], span[9]),
-          let hour = parseTwoDigits(span[11], span[12]),
-          let minute = parseTwoDigits(span[14], span[15]),
-          let second = parseTwoDigits(span[17], span[18]),
-          checkMonth(month), checkHour(hour), checkMinute(minute), checkSecond(second)
-    else {
-        return nil
-    }
+    // These unaligned loads read bytes 0...7, 8...15, and 16...19, entirely
+    // within the minimum length. Normalize byte order for the masks below.
+    // Their windows are "YYYY-MM-", "DDTHH:MM", and ":SS?", low byte first.
+    guard span.count >= 20 else { return nil }
+    let date = span.bytes.unsafeLoadUnaligned(as: UInt64.self).littleEndian
+    let time = span.bytes.unsafeLoadUnaligned(fromByteOffset: 8, as: UInt64.self).littleEndian
+    let tail = span.bytes.unsafeLoadUnaligned(fromByteOffset: 16, as: UInt32.self).littleEndian
+    guard date & 0xFF_00_00_FF_00_00_00_00 == 0x2D_00_00_2D_00_00_00_00,
+          time & 0x00_00_FF_00_00_FF_00_00 == 0x00_00_3A_00_00_54_00_00,
+          tail & 0xFF == 0x3A
+    else { return nil }
 
-    let year = century * 100 + yearInCentury
+    // XOR the expected separators to zero and ASCII digits to values 0...9.
+    // Separators were checked above because zero is also a valid digit lane.
+    let dateDigits = date ^ 0x2D_30_30_2D_30_30_30_30
+    let timeDigits = time ^ 0x30_30_3A_30_30_54_30_30
+    let secondDigits = UInt64((tail >> 8) & 0xFFFF) ^ 0x3030
+
+    // In each byte, adding 0x76 sets bit 7 for values 10...127. OR with the
+    // original value also rejects 128...255. Valid lanes cannot carry into
+    // adjacent bytes; a carry from an invalid lane cannot hide its rejection.
+    // Combine the independent words before testing their high bits once.
+    let invalidDigits = ((dateDigits &+ 0x76_76_76_76_76_76_76_76) | dateDigits)
+        | ((timeDigits &+ 0x76_76_76_76_76_76_76_76) | timeDigits)
+        | ((secondDigits &+ 0x7676) | secondDigits)
+    guard invalidDigits & 0x80_80_80_80_80_80_80_80 == 0 else { return nil }
+
+    let year = decodeTwoDigits(dateDigits) * 100 + decodeTwoDigits(dateDigits >> 16)
+    let month = decodeTwoDigits(dateDigits >> 40)
+    let day = decodeTwoDigits(timeDigits)
+    let hour = decodeTwoDigits(timeDigits >> 24)
+    let minute = decodeTwoDigits(timeDigits >> 48)
+    let second = decodeTwoDigits(secondDigits)
+    guard checkMonth(month), checkHour(hour), checkMinute(minute), checkSecond(second) else { return nil }
     guard checkDay(year: year, month: month, day: day) else { return nil }
 
     var index = 19
@@ -230,13 +244,19 @@ public func parse(
     } else {
         guard direction == Component.plus.rawValue || direction == Component.dash.rawValue,
               span.count - index >= 6,
-              span[index + 3] == Component.colon.rawValue,
-              let zoneHour = parseTwoDigits(span[index + 1], span[index + 2]),
-              let zoneMinute = parseTwoDigits(span[index + 4], span[index + 5]),
-              checkHour(zoneHour), checkMinute(zoneMinute)
+              span[index + 3] == Component.colon.rawValue
         else {
             return nil
         }
+        // The six-byte offset was checked above. Load its two digit pairs
+        // without reading beyond it, then validate all four lanes together.
+        let zoneHours = span.bytes.unsafeLoadUnaligned(fromByteOffset: index + 1, as: UInt16.self).littleEndian
+        let zoneMinutes = span.bytes.unsafeLoadUnaligned(fromByteOffset: index + 4, as: UInt16.self).littleEndian
+        let zoneDigits = (UInt32(zoneHours) | (UInt32(zoneMinutes) << 16)) ^ 0x30_30_30_30
+        guard ((zoneDigits &+ 0x76_76_76_76) | zoneDigits) & 0x80_80_80_80 == 0 else { return nil }
+        let zoneHour = decodeTwoDigits(UInt64(zoneDigits))
+        let zoneMinute = decodeTwoDigits(UInt64(zoneDigits >> 16))
+        guard checkHour(zoneHour), checkMinute(zoneMinute) else { return nil }
         let offset = zoneHour * 60 + zoneMinute
         zone = direction == Component.dash.rawValue ? (offset == 0 ? nil : -offset) : offset
         index += 6
@@ -296,11 +316,9 @@ public func parseFromDecoder(_ decoder: some Decoder) throws -> Date {
 
 // MARK: - Private
 
-private func parseTwoDigits(_ first: UInt8, _ second: UInt8) -> Int? {
-    let tens = first &- Component.n0.rawValue
-    let ones = second &- Component.n0.rawValue
-    guard tens < 10, ones < 10 else { return nil }
-    return Int(tens) * 10 + Int(ones)
+// The two low bytes must already have been validated as decimal digit values.
+private func decodeTwoDigits(_ digits: UInt64) -> Int {
+    Int(digits & 0xFF) * 10 + Int((digits >> 8) & 0xFF)
 }
 
 private enum Component: UInt8 {
